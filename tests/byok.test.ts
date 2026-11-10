@@ -14,7 +14,7 @@ import { regenerate, type OC } from '../src/kernel/regen';
 import { massProperties, entityInfo } from '../src/kernel/query';
 import { TOOL_DEFS, type ExecutorContext } from '../src/ai/executor';
 import { inlineRefs, forGemini } from '../src/ai/byok/schema';
-import { buildPayload, parseResponse, appendToolResults, appendUser, MAX_OUTPUT_TOKENS, ANTHROPIC_FALLBACK_BETA, type ToolOutcome } from '../src/ai/byok/providers';
+import { buildPayload, parseResponse, appendToolResults, appendUser, fitPayload, MAX_REQUEST_BYTES, IMAGE_REMOVED_NOTE, MAX_OUTPUT_TOKENS, ANTHROPIC_FALLBACK_BETA, type ToolOutcome } from '../src/ai/byok/providers';
 import { runAgent, byokSystemPrompt, BYOK_LIMITS, PROXY_PATH, KEY_HEADER, callProxy } from '../src/ai/byok/agent';
 import { DEFAULT_MODELS, STORAGE_KEYS, readAiSettings, saveAiSettings, keyProblem, modelProblem, effectiveModel, _resetAiSettingsCache, type ByokProvider } from '../src/ai/byok/settings';
 // @ts-expect-error plain JS module
@@ -383,6 +383,7 @@ describe('usage guards and errors', () => {
     await expect(call(404, '<!doctype html><html></html>')).rejects.toThrow(/proxy is not set up/);
     await expect(call(200, '<!doctype html>')).rejects.toThrow(/proxy is not set up/);
     await expect(call(400, '{"proxyError":"No API key was sent."}')).rejects.toThrow('No API key was sent.');
+    await expect(call(413, 'Request Entity Too Large\n\nFUNCTION_PAYLOAD_TOO_LARGE')).rejects.toThrow(/too large to send.*New chat/);
     await expect(callProxy(req, 'k', (async () => { throw new TypeError('net'); }) as any)).rejects.toThrow(/Could not reach the AI proxy/);
   });
 
@@ -395,6 +396,68 @@ describe('usage guards and errors', () => {
     const r = await runAgent({ provider: 'anthropic', model: 'claude-opus-5-5', apiKey: 'k', ctx: ctx(new DocumentStore()), history: [], text: 'x', onEvent: () => {}, fetchFn, signal: abort.signal });
     expect(r.ok).toBe(false);
     expect(r.error).toMatch(/^Stopped/);
+  });
+});
+
+describe('request size (Vercel Functions accept at most 4.5 MB)', () => {
+  // One render's base64 (a real 640 px render is roughly 50 to 300 KB).
+  const png = (n: number) => `render${n}x`.padEnd(300_000, 'A');
+  const chat = (p: ByokProvider, renders: number) => {
+    let h = appendUser(p, [], 'make a bracket');
+    for (let n = 0; n < renders; n++) {
+      const call = { id: `c${n}`, name: 'view_model', args: {} };
+      const turn = p === 'anthropic' ? { role: 'assistant', content: [{ type: 'tool_use', id: call.id, name: call.name, input: {} }] }
+        : p === 'openai' ? { role: 'assistant', content: null, tool_calls: [{ id: call.id, type: 'function', function: { name: call.name, arguments: '{}' } }] }
+        : { role: 'model', parts: [{ functionCall: { name: call.name, args: {} } }] };
+      h = appendToolResults(p, h, turn, [{ call, ok: true, text: '{"ok":true}', images: [{ data: png(n), mimeType: 'image/png' }] }]);
+    }
+    return h;
+  };
+  const size = (x: unknown) => new TextEncoder().encode(JSON.stringify(x)).length;
+  const images = (h: unknown[]) => { const out: string[] = []; walk(h, (k, v) => { if ((k === 'data' || k === 'url') && typeof v === 'string' && v.length > 1000) out.push(v); }); return out; };
+
+  it('stays under the limit, with room for headers below Vercel\'s 4.5 MB', () => {
+    expect(MAX_REQUEST_BYTES).toBeLessThanOrEqual(4_000_000);
+  });
+
+  for (const p of PROVIDERS) {
+    it(`${p}: a small chat is sent unchanged`, () => {
+      const history = chat(p, 3);
+      const r = fitPayload({ provider: p, model: 'm', system: 'S', tools: TOOL_DEFS, history })!;
+      expect(r.removed).toBe(0);
+      expect(r.history).toBe(history);
+    });
+
+    it(`${p}: a long chat drops its oldest renders first, keeps the newest, and fits`, () => {
+      const history = chat(p, 30);
+      const before = JSON.stringify(history);
+      const r = fitPayload({ provider: p, model: 'm', system: 'S', tools: TOOL_DEFS, history })!;
+      expect(r).not.toBeNull();
+      expect(size(r.payload)).toBeLessThanOrEqual(MAX_REQUEST_BYTES);
+      expect(r.removed).toBeGreaterThan(0);
+      // The caller's history is not changed; the returned one has notes where renders were.
+      expect(JSON.stringify(history)).toBe(before);
+      expect(JSON.stringify(r.history).split(IMAGE_REMOVED_NOTE).length - 1).toBe(r.removed);
+      const kept = images(r.history);
+      expect(kept.length).toBe(30 - r.removed);
+      // The newest render is the last one kept, the oldest is gone.
+      expect(kept.at(-1)).toContain('render29x');
+      expect(kept.some((d) => d.includes('render0x'))).toBe(false);
+      // Model turns are untouched (thinking blocks / thought signatures must stay as returned).
+      const modelTurns = (h: any[]) => JSON.stringify(h.filter((t) => t?.role !== 'user' && t?.role !== 'tool'));
+      expect(modelTurns(r.history)).toBe(modelTurns(history));
+    });
+  }
+
+  it('a chat too large even without renders stops with a plain message, before calling the proxy', async () => {
+    let called = 0;
+    const fetchFn = (async () => { called++; return new Response('{}'); }) as unknown as typeof fetch;
+    const huge = appendUser('anthropic', [], 'x'.repeat(MAX_REQUEST_BYTES));
+    expect(fitPayload({ provider: 'anthropic', model: 'm', system: 'S', tools: [], history: huge })).toBeNull();
+    const r = await runAgent({ provider: 'anthropic', model: 'claude-opus-5-5', apiKey: 'k', ctx: ctx(new DocumentStore()), history: huge, text: 'go', onEvent: () => {}, fetchFn });
+    expect(r.ok).toBe(false);
+    expect(r.error).toMatch(/too large to send.*New chat/);
+    expect(called).toBe(0);
   });
 });
 

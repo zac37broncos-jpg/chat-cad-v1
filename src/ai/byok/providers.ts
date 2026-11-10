@@ -1,10 +1,11 @@
 /**
  * The three providers' request and response formats, in one place.
  *
- * Each conversation is kept in the provider's own message format and only ever appended to
- * (never edited), and every model turn is stored exactly as the provider returned it. That
- * keeps Anthropic thinking blocks and Gemini thought signatures intact, which both providers
- * require during tool use.
+ * Each conversation is kept in the provider's own message format and only ever appended to,
+ * and every model turn is stored exactly as the provider returned it. That keeps Anthropic
+ * thinking blocks and Gemini thought signatures intact, which both providers require during
+ * tool use. The one exception is fitPayload: when a long chat would be too large to send, it
+ * swaps the oldest renders (in user turns only, never in model turns) for a short text note.
  *
  * Formats (checked against the official docs on 2026-11-10, sources in docs/BYOK_AI.md):
  *  - Anthropic Messages API: POST https://api.anthropic.com/v1/messages
@@ -283,4 +284,62 @@ export function appendModelTurn(history: unknown[], modelTurn: unknown): unknown
 export function providerErrorMessage(json: any): string | null {
   const m = json?.error?.message ?? (typeof json?.error === 'string' ? json.error : null) ?? json?.message;
   return typeof m === 'string' && m.trim() ? m.trim() : null;
+}
+
+/**
+ * The largest request the browser sends to /api/proxy, in bytes. Vercel Functions refuse request
+ * bodies over 4.5 MB (413 FUNCTION_PAYLOAD_TOO_LARGE, https://vercel.com/docs/functions/limitations),
+ * so this stays under that with room to spare. Renders are by far the largest part of a chat.
+ */
+export const MAX_REQUEST_BYTES = 4_000_000;
+export const IMAGE_REMOVED_NOTE = '(An earlier render was removed here to keep the request small. Call view_model again if you need to see the part.)';
+
+const isImage = (provider: ByokProvider, x: any): boolean => {
+  if (!x || typeof x !== 'object' || Array.isArray(x)) return false;
+  switch (provider) {
+    case 'anthropic': return x.type === 'image';
+    case 'openai': return x.type === 'image_url';
+    case 'gemini': return 'inlineData' in x;
+    default: return false;
+  }
+};
+const imageNoteBlock = (provider: ByokProvider) => (provider === 'gemini' ? { text: IMAGE_REMOVED_NOTE } : { type: 'text', text: IMAGE_REMOVED_NOTE });
+const utf8Bytes = (s: string) => new TextEncoder().encode(s).length;
+
+/** Every image block in the user turns of a history, oldest first. */
+function imageSlots(provider: ByokProvider, history: unknown[]): { list: unknown[]; i: number; bytes: number }[] {
+  const out: { list: unknown[]; i: number; bytes: number }[] = [];
+  const visit = (node: unknown) => {
+    if (Array.isArray(node)) {
+      node.forEach((v, i) => { if (isImage(provider, v)) out.push({ list: node, i, bytes: utf8Bytes(JSON.stringify(v)) }); else visit(v); });
+    } else if (node && typeof node === 'object') {
+      for (const v of Object.values(node)) visit(v);
+    }
+  };
+  for (const turn of history) if ((turn as any)?.role === 'user') visit(turn);
+  return out;
+}
+
+/**
+ * Build the payload, and if it is larger than maxBytes, replace the oldest renders with a short
+ * note until it fits. Returns the payload and the history to keep using (a copy when anything
+ * was removed), or null when even without any render the chat is still too large.
+ */
+export function fitPayload(p: PayloadInput, maxBytes: number = MAX_REQUEST_BYTES): { payload: ProxyRequest; history: unknown[]; removed: number } | null {
+  let payload = buildPayload(p);
+  let size = utf8Bytes(JSON.stringify(payload));
+  if (size <= maxBytes) return { payload, history: p.history, removed: 0 };
+  const history = structuredClone(p.history);
+  const noteBytes = utf8Bytes(JSON.stringify(imageNoteBlock(p.provider)));
+  let removed = 0;
+  for (const slot of imageSlots(p.provider, history)) {
+    if (size <= maxBytes) break;
+    slot.list[slot.i] = imageNoteBlock(p.provider);
+    size -= slot.bytes - noteBytes;
+    removed++;
+  }
+  if (!removed) return null;
+  payload = buildPayload({ ...p, history });
+  if (utf8Bytes(JSON.stringify(payload)) > maxBytes) return null;
+  return { payload, history, removed };
 }

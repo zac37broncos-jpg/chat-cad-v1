@@ -43,6 +43,11 @@ Each request stops at 60 AI replies, 150 CAD tool calls, 6 renders, or the same 
 times in a row (`BYOK_LIMITS`, kept equal to `bridge/hub.mjs` by a test). Whatever was built
 stays and is one undo step. The Stop button ends the request.
 
+Each message to `/api/proxy` is kept under 4 MB (`MAX_REQUEST_BYTES`), because Vercel Functions
+refuse anything over 4.5 MB. Renders are the large part, so in a long chat the oldest renders are
+replaced by a short note ("an earlier render was removed") and the newest are kept. If a chat is
+still too large, it stops with a message asking for **New chat**; nothing built is lost.
+
 ## Providers: formats, defaults and differences
 
 Checked against each provider's official documentation on 2026-11-10.
@@ -134,6 +139,22 @@ After deploying, open Options, **About CHAD and licences**: it should say "Cross
 6. Click the new website address. Open the AI chat's gear (⚙), choose a provider, paste your
    own key, Save, and ask for a simple part such as "a 2 x 1 x 0.25 in plate".
 7. From now on every merge into `main` updates the website by itself.
+
+**Free (Hobby) plan.** Everything above works on Vercel's free Hobby plan, with no card: no paid
+feature is used (one function, no environment variables, no add-ons, no password protection).
+What the free plan allows each month, from Vercel's docs (vercel.com/docs/plans/hobby and
+vercel.com/docs/functions/limitations, checked 2026-11-10):
+
+- 100 GB of data sent to visitors. A first visit downloads up to about 25 MB (mostly the OpenCascade
+  WebAssembly, then cached by the browser for a year), so roughly 4,000 first visits a month.
+- 1,000,000 function calls, 4 hours of active CPU and 360 GB-hours of memory for `/api/proxy`.
+  Waiting for the AI does not count as CPU. Memory is counted while a call waits (2 GB x the wait),
+  so about 180 hours of AI waiting a month, several thousand chat replies.
+- Each proxy call may run up to 300 seconds (the Hobby maximum, set in `vercel.json`), and each
+  request may be at most 4.5 MB (see the guards above).
+- Going over a limit never costs money on Hobby: the feature pauses until 30 days have passed.
+- Hobby is for personal, non-commercial use only. Selling CHAD or charging for it from this site
+  would need Vercel's paid Pro plan (or another host).
 
 ### Option B: Cloudflare Pages
 

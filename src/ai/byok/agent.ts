@@ -13,7 +13,7 @@
 import SYSTEM_PROMPT from '../../../bridge/system-prompt.md?raw';
 import { executeTool, TOOL_DEFS, type ExecutorContext } from '../executor';
 import {
-  appendModelTurn, appendToolResults, appendUser, BAD_ARGUMENTS, buildPayload, parseResponse, providerErrorMessage,
+  appendModelTurn, appendToolResults, appendUser, BAD_ARGUMENTS, fitPayload, parseResponse, providerErrorMessage, MAX_REQUEST_BYTES,
   type ProxyRequest, type ToolCall, type ToolOutcome,
 } from './providers';
 import { PROVIDER_LABELS, type ByokProvider } from './settings';
@@ -80,6 +80,8 @@ export const byokLimitMessage = (which: 'turns' | 'calls' | 'repeat', l: Readonl
 };
 const viewLimitError = (l: Readonly<ByokLimits> = BYOK_LIMITS) => `view_model limit reached: at most ${l.maxViews} renders per request (renders cost the user the most). Do not call view_model again in this request. Finish with what you have, and tell the user they can ask for another look.`;
 
+const TOO_LARGE = `This chat has grown too large to send (over ${MAX_REQUEST_BYTES / 1_000_000} MB, the most the website's AI proxy accepts). Everything built so far is kept. Click New chat to continue in a fresh conversation.`;
+
 /** Send one request to the proxy and return the provider's JSON, or throw a plain-words ChatError. */
 export async function callProxy(req: ProxyRequest, apiKey: string, fetchFn: typeof fetch = fetch, signal?: AbortSignal): Promise<any> {
   const name = PROVIDER_LABELS[req.provider];
@@ -100,6 +102,8 @@ export async function callProxy(req: ProxyRequest, apiKey: string, fetchFn: type
   let json: any = null;
   try { json = raw ? JSON.parse(raw) : null; } catch { /* not JSON: handled below */ }
   if (res.ok && json) return json;
+  // Vercel answers an oversized body itself (413 FUNCTION_PAYLOAD_TOO_LARGE), before the proxy runs.
+  if (res.status === 413) throw new ChatError(json?.proxyError ? String(json.proxyError) : TOO_LARGE);
   if (!json) {
     // A static host with no proxy answers with its own page (404 or the app's index.html).
     throw new ChatError(`The AI proxy is not set up on this website (${PROXY_PATH} answered with ${res.status} and no AI reply). See docs/BYOK_AI.md, "Deploy the proxy".`);
@@ -151,8 +155,11 @@ export async function runAgent(o: AgentOptions): Promise<AgentResult> {
   for (let turn = 0; turn < limits.maxTurns; turn++) {
     if (o.signal?.aborted) return fail('Stopped. Everything built so far is kept (one undo step).');
     let json: any;
+    const fitted = fitPayload({ provider: o.provider, model: o.model, system, tools, history });
+    if (!fitted) return fail(TOO_LARGE);
+    history = fitted.history;
     try {
-      json = await callProxy(buildPayload({ provider: o.provider, model: o.model, system, tools, history }), o.apiKey, fetchFn, o.signal);
+      json = await callProxy(fitted.payload, o.apiKey, fetchFn, o.signal);
     } catch (e) {
       if (o.signal?.aborted) return fail('Stopped. Everything built so far is kept (one undo step).');
       return fail(e instanceof Error ? e.message : String(e));
