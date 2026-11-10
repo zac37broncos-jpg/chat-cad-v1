@@ -16,6 +16,7 @@ import { MM_PER } from '../core/units';
 import { faceRefFrom, edgeRefFrom, describeTag, type Topology } from '../kernel/naming';
 import TOOLS from './featureTools.json';
 import { resolveFeatureRef } from './refs';
+import { faceIndex, edgeIndex } from '../ui/picks';
 
 export const FEATURE_TOOL_DEFS = TOOLS as { name: string; description: string; inputSchema: Record<string, unknown> }[];
 export const FEATURE_TOOL_NAMES = new Set(FEATURE_TOOL_DEFS.map((t) => t.name));
@@ -39,51 +40,97 @@ function featureIdOf(ctx: ExecutorContext, v: unknown, what: string): string {
   return id;
 }
 
-function faceRefs(ctx: ExecutorContext, t: Topology, list: unknown, what: string): FaceRef[] {
+/**
+ * Picks for changing an existing feature (update_feature). {index} and
+ * "selection" name items of the part as it is now (what get_topology lists
+ * and the user sees); {feature} and {between} look at the part just before
+ * the feature, where it is applied (so they also find edges the feature
+ * itself already rounds). Every reference must exist on that earlier part.
+ */
+interface EditPicks { before: Topology | null; name: string }
+
+function partBefore(e: EditPicks, what: string): Topology {
+  if (!e.before) throw new Error(`${what}: the part before "${e.name}" is not available here, so its picks cannot be changed`);
+  return e.before;
+}
+
+const strings = (v: unknown) => Array.isArray(v) && v.every((x) => typeof x === 'string');
+const point = (v: unknown) => Array.isArray(v) && v.length === 3 && v.every((x) => typeof x === 'number' && Number.isFinite(x));
+/** A face reference as features store it ({tags, at}), e.g. copied back from the feature. */
+const isStoredFace = (v: Args) => strings(v.tags) && v.tags.length > 0 && (v.at === undefined || point(v.at));
+/** An edge reference as features store it ({a, b, at}). */
+const isStoredEdge = (v: Args) => strings(v.a) && strings(v.b) && v.a.length > 0 && v.b.length > 0 && (v.at === undefined || point(v.at));
+
+function checkFaceBefore(e: EditPicks, ref: FaceRef, index: number, what: string): FaceRef {
+  if (faceIndex(partBefore(e, what), ref) === null) {
+    throw new Error(`${what}: face ${index} was made by "${e.name}" or a later feature, so it is not on the part "${e.name}" is applied to. Use {feature: '<name>'} to pick faces of an earlier feature.`);
+  }
+  return ref;
+}
+
+function checkEdgeBefore(e: EditPicks, ref: EdgeRef, index: number, what: string): EdgeRef {
+  if (edgeIndex(partBefore(e, what), ref) === null) {
+    throw new Error(`${what}: edge ${index} touches a face made by "${e.name}" or a later feature, so it is not on the part "${e.name}" is applied to. Use {between: ['<feature A>', '<feature B>']} or {feature: '<name>'}: they look at the part before "${e.name}", including edges it already rounds.`);
+  }
+  return ref;
+}
+
+function faceRefs(ctx: ExecutorContext, t: Topology, list: unknown, what: string, edit?: EditPicks): FaceRef[] {
   if (list === undefined) return [];
   if (!Array.isArray(list)) throw new Error(`${what} must be an array`);
   const out: FaceRef[] = [];
+  const pick = (i: number) => { const r = faceRefFrom(t, i); out.push(edit ? checkFaceBefore(edit, r, i, what) : r); };
   for (const item of list) {
     if (item === 'selection') {
-      for (const s of ctx.selection()) if (s.kind === 'face') out.push(faceRefFrom(t, s.index));
+      for (const s of ctx.selection()) if (s.kind === 'face') pick(s.index);
     } else if (item && typeof item === 'object' && Number.isInteger((item as Args).index)) {
-      out.push(faceRefFrom(t, (item as Args).index));
+      pick((item as Args).index);
     } else if (item && typeof item === 'object' && (item as Args).feature !== undefined) {
       const fid = featureIdOf(ctx, (item as Args).feature, what);
+      const tb = edit ? partBefore(edit, what) : t;
       const n = out.length;
-      t.faces.forEach((f, i) => { if (ownedBy(f.tags, fid)) out.push(faceRefFrom(t, i)); });
-      if (out.length === n) throw new Error(`${what}: feature "${(item as Args).feature}" has no faces on the part`);
+      tb.faces.forEach((f, i) => { if (ownedBy(f.tags, fid)) out.push(faceRefFrom(tb, i)); });
+      if (out.length === n) throw new Error(`${what}: feature "${(item as Args).feature}" has no faces on the part${edit ? ` before "${edit.name}"` : ''}`);
+    } else if (edit && item && typeof item === 'object' && isStoredFace(item as Args)) {
+      const o = item as Args;
+      out.push({ tags: [...o.tags], ...(o.at ? { at: [...o.at] as Vec3 } : {}) });
     } else throw new Error(`${what}: each item is {index}, {feature} or "selection"`);
   }
   return out;
 }
 
-function edgeRefs(ctx: ExecutorContext, t: Topology, list: unknown, what: string): EdgeRef[] {
+function edgeRefs(ctx: ExecutorContext, t: Topology, list: unknown, what: string, edit?: EditPicks): EdgeRef[] {
   if (list === undefined) return [];
   if (!Array.isArray(list)) throw new Error(`${what} must be an array`);
   const out: EdgeRef[] = [];
+  const pick = (i: number) => { const r = edgeRefFrom(t, i); out.push(edit ? checkEdgeBefore(edit, r, i, what) : r); };
   for (const item of list) {
     if (item === 'selection') {
-      for (const s of ctx.selection()) if (s.kind === 'edge') out.push(edgeRefFrom(t, s.index));
+      for (const s of ctx.selection()) if (s.kind === 'edge') pick(s.index);
     } else if (item && typeof item === 'object' && Number.isInteger((item as Args).index)) {
-      out.push(edgeRefFrom(t, (item as Args).index));
+      pick((item as Args).index);
     } else if (item && typeof item === 'object' && ((item as Args).feature !== undefined || Array.isArray((item as Args).between))) {
       const o = item as Args;
+      const tb = edit ? partBefore(edit, what) : t;
+      const on = edit ? ` before "${edit.name}"` : '';
       const n = out.length;
       if (o.between) {
         if (o.between.length !== 2) throw new Error(`${what}: between needs two feature names`);
         const A = featureIdOf(ctx, o.between[0], what), B = featureIdOf(ctx, o.between[1], what);
-        t.edges.forEach((e, i) => {
+        tb.edges.forEach((e, i) => {
           if (e.faces.length < 2) return;
-          const fa = t.faces[e.faces[0]].tags, fb = t.faces[e.faces[1]].tags;
-          if ((ownedBy(fa, A) && ownedBy(fb, B)) || (ownedBy(fa, B) && ownedBy(fb, A))) out.push(edgeRefFrom(t, i));
+          const fa = tb.faces[e.faces[0]].tags, fb = tb.faces[e.faces[1]].tags;
+          if ((ownedBy(fa, A) && ownedBy(fb, B)) || (ownedBy(fa, B) && ownedBy(fb, A))) out.push(edgeRefFrom(tb, i));
         });
-        if (out.length === n) throw new Error(`${what}: "${o.between[0]}" and "${o.between[1]}" do not meet in an edge on the part`);
+        if (out.length === n) throw new Error(`${what}: "${o.between[0]}" and "${o.between[1]}" do not meet in an edge on the part${on}`);
       } else {
         const fid = featureIdOf(ctx, o.feature, what);
-        t.edges.forEach((e, i) => { if (e.faces.some((fi) => ownedBy(t.faces[fi].tags, fid))) out.push(edgeRefFrom(t, i)); });
-        if (out.length === n) throw new Error(`${what}: feature "${o.feature}" has no edges on the part`);
+        tb.edges.forEach((e, i) => { if (e.faces.some((fi) => ownedBy(tb.faces[fi].tags, fid))) out.push(edgeRefFrom(tb, i)); });
+        if (out.length === n) throw new Error(`${what}: feature "${o.feature}" has no edges on the part${on}`);
       }
+    } else if (edit && item && typeof item === 'object' && isStoredEdge(item as Args)) {
+      const o = item as Args;
+      out.push({ a: [...o.a], b: [...o.b], ...(o.at ? { at: [...o.at] as Vec3 } : {}) });
     } else throw new Error(`${what}: each item is {index}, {feature}, {between} or "selection"`);
   }
   return out;
@@ -91,12 +138,15 @@ function edgeRefs(ctx: ExecutorContext, t: Topology, list: unknown, what: string
 
 const PLANES = ['XY', 'XZ', 'YZ'];
 
-async function planeSpec(ctx: ExecutorContext, p: Args | undefined, what: string): Promise<PlaneSpec> {
+async function planeSpec(ctx: ExecutorContext, p: Args | undefined, what: string, edit?: EditPicks): Promise<PlaneSpec> {
   if (!p || typeof p !== 'object') throw new Error(`${what}: give {plane, offset}, {face:{index}} or {ref_plane_id}`);
   if (p.ref_plane_id) return { refPlane: String(p.ref_plane_id) };
+  // update_feature may hand back a plane the way features store it.
+  if (edit && typeof p.refPlane === 'string') return { refPlane: resolveFeatureRef(ctx.store, p.refPlane) as string };
+  if (edit && PLANES.includes(p.base)) return { base: p.base, ...(p.offset !== undefined && p.offset !== '' ? { offset: p.offset } : {}) };
   if (p.face !== undefined) {
     const t = await topo(ctx);
-    const refs = faceRefs(ctx, t, [p.face], what);
+    const refs = faceRefs(ctx, t, [p.face], what, edit);
     if (!refs.length) throw new Error(`${what}: no face selected`);
     return { face: refs[0] };
   }
@@ -104,15 +154,16 @@ async function planeSpec(ctx: ExecutorContext, p: Args | undefined, what: string
   throw new Error(`${what}: unknown plane`);
 }
 
-async function axisSpec(ctx: ExecutorContext, a: unknown, what: string): Promise<AxisSpec> {
+async function axisSpec(ctx: ExecutorContext, a: unknown, what: string, edit?: EditPicks): Promise<AxisSpec> {
   if (a === 'X' || a === 'Y' || a === 'Z') return { axis: a };
   if (a && typeof a === 'object') {
     const o = a as Args;
     if (o.ref_axis_id) return { refAxis: String(o.ref_axis_id) };
+    if (edit && typeof o.refAxis === 'string') return { refAxis: resolveFeatureRef(ctx.store, o.refAxis) as string };
     if (o.axis === 'X' || o.axis === 'Y' || o.axis === 'Z') return { axis: o.axis };
     const t = await topo(ctx);
-    if (o.edge !== undefined) return { edge: edgeRefs(ctx, t, [o.edge], what)[0] };
-    if (o.face !== undefined) return { face: faceRefs(ctx, t, [o.face], what)[0] };
+    if (o.edge !== undefined) return { edge: edgeRefs(ctx, t, [o.edge], what, edit)[0] };
+    if (o.face !== undefined) return { face: faceRefs(ctx, t, [o.face], what, edit)[0] };
   }
   throw new Error(`${what}: give 'X'/'Y'/'Z', {edge:{index}}, {face:{index}} or {ref_axis_id}`);
 }
@@ -228,6 +279,52 @@ async function run(ctx: ExecutorContext, name: string, a: Args): Promise<string>
     }
     default: throw new Error(`Unknown tool ${name}`);
   }
+}
+
+/** Fields of modelling features that hold face / edge / plane / axis references, and the tool argument names that also set them. */
+const PICK_FIELDS: Partial<Record<Feature['type'], { edges?: string[]; faces?: string[]; planes?: string[]; axes?: string[]; alias?: Record<string, string> }>> = {
+  fillet: { edges: ['edges'], faces: ['faces', 'faces2'], alias: { start_point: 'startAt' } },
+  chamfer: { edges: ['edges'], faces: ['faces'] },
+  shell: { faces: ['faces'], alias: { open_faces: 'faces' } },
+  draft: { faces: ['faces'], planes: ['neutral'], alias: { neutral_plane: 'neutral' } },
+  hole: { planes: ['placement'] },
+  mirror: { planes: ['plane'] },
+  linearPattern: { axes: ['dir1', 'dir2'], alias: { direction1: 'dir1', direction2: 'dir2' } },
+  circularPattern: { axes: ['axis'] },
+};
+
+/**
+ * update_feature: turn the picks in `changes` ({index}, {feature}, {between},
+ * "selection", planes and axes in the creation tool's format) into the
+ * persistent references the feature stores, exactly like the tool that made
+ * it. Raw picks stored as they came would break the next rebuild.
+ * See EditPicks for which part each kind of pick names.
+ */
+export async function convertPicks(ctx: ExecutorContext, featureId: string, changes: Args): Promise<Args> {
+  const f = ctx.store.feature(featureId);
+  if (!f) throw new Error(`No feature ${featureId}`);
+  const spec = PICK_FIELDS[f.type];
+  if (!spec) return changes;
+  const out: Args = { ...changes };
+  for (const [from, to] of Object.entries(spec.alias ?? {})) {
+    if (out[from] === undefined) continue;
+    if (out[to] !== undefined) throw new Error(`update_feature: give ${to} or ${from}, not both`);
+    out[to] = out[from]; delete out[from];
+    if (from === 'start_point' && out[to] !== null) {
+      if (!point(out[to])) throw new Error('start_point must be [x, y, z] numbers in document units');
+      out[to] = (out[to] as number[]).map((c) => c * MM_PER[ctx.store.state.units]);
+    }
+  }
+  const has = (k: string) => out[k] !== undefined && out[k] !== null;
+  const keys = [...spec.edges ?? [], ...spec.faces ?? [], ...spec.planes ?? [], ...spec.axes ?? []];
+  if (!keys.some(has)) return out;
+  const t = await topo(ctx);
+  const edit: EditPicks = { before: ctx.topologyBefore ? await ctx.topologyBefore(f.id) : null, name: f.name };
+  for (const k of spec.edges ?? []) if (has(k)) out[k] = edgeRefs(ctx, t, out[k], k, edit);
+  for (const k of spec.faces ?? []) if (has(k)) out[k] = faceRefs(ctx, t, out[k], k, edit);
+  for (const k of spec.planes ?? []) if (has(k)) out[k] = await planeSpec(ctx, out[k], k, edit);
+  for (const k of spec.axes ?? []) if (has(k)) out[k] = await axisSpec(ctx, out[k], k, edit);
+  return out;
 }
 
 /**

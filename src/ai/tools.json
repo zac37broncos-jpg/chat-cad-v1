@@ -515,7 +515,7 @@
   },
   {
     "name": "update_feature",
-    "description": "Change inputs of an existing feature, e.g. {feature_id, changes:{depth:'0.75'}} for an extrude, {changes:{name:'Base'}} to rename, {changes:{suppressed:true}} to suppress. To change a sketch's geometry, pass changes.entities (full replacement list, in create_sketch format) or prefer editing the parameters it uses.",
+    "description": "Change inputs of an existing feature, e.g. {feature_id, changes:{depth:'0.75'}} for an extrude, {changes:{name:'Base'}} to rename, {changes:{suppressed:true}} to suppress. To change a sketch's geometry, pass changes.entities (full replacement list, in create_sketch format) or prefer editing the parameters it uses. To change which edges/faces a fillet, chamfer, shell (open_faces) or draft uses, or a hole's placement, a mirror plane or a pattern direction/axis, pass them in the same format as the tool that made it; the list replaces the old one. {index} and 'selection' are items of the part as it is now (get_topology); {feature} and {between} look at the part just before the feature, so they also find edges it already rounds.",
     "inputSchema": {
       "type": "object",
       "properties": {

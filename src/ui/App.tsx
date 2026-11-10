@@ -44,6 +44,7 @@ const bridge = new BridgeClient({
   selectedFeatures: () => currentTreeSel,
   info: (ref) => kernel.call({ op: 'info', ref }),
   quality: () => kernel.call({ op: 'quality' }),
+  topologyBefore: (featureId) => kernel.call({ op: 'topologyBefore', doc: store.state, featureId }),
   snapshot: async (views, size, edges) => {
     const r = await kernel.call({ op: 'regen', doc: store.state, topology: false, mass: false });
     return r.mesh ? renderSnapshots(r.mesh, views as SnapshotView[], size, edges) : [];
