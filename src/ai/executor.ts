@@ -16,9 +16,10 @@ import type { FeatureStatus } from '../kernel/regen';
 import type { RegenResponse, SubRef, SelRef } from '../kernel/protocol';
 import type { EntityInfo } from '../kernel/query';
 import type { PartQuality } from '../kernel/quality';
+import type { Topology } from '../kernel/naming';
 import { getReference } from './references';
 import TOOLS from './tools.json';
-import { FEATURE_TOOL_DEFS, FEATURE_TOOL_NAMES, executeFeatureTool, summarizeModelingFeature } from './featureTools';
+import { FEATURE_TOOL_DEFS, FEATURE_TOOL_NAMES, executeFeatureTool, summarizeModelingFeature, convertPicks } from './featureTools';
 import { resolveFeatureRef } from './refs';
 import BATCH_TOOLS from './batchTool.json';
 import { ORGANIC_TOOL_DEFS, ORGANIC_TOOL_NAMES, executeOrganicTool } from './organicTools';
@@ -44,6 +45,12 @@ export interface ExecutorContext {
   snapshot?: (views: string[], size: number, edges: boolean) => Promise<{ view: string; png: string }[]>;
   /** Printability / CAM check of the last regenerated part (check_part, build_model report). */
   quality?: () => Promise<PartQuality>;
+  /**
+   * Face names and edges of the part just before a feature (the part it is
+   * applied to), without changing the current part. update_feature uses it to
+   * re-pick a feature's edges and faces.
+   */
+  topologyBefore?: (featureId: string) => Promise<Topology | null>;
 }
 
 type Args = Record<string, any>;
@@ -453,7 +460,8 @@ export async function executeTool(ctx: ExecutorContext, name: string, args: Args
         if (changes[from] !== undefined) { changes[to] = changes[from] === false ? null : changes[from]; delete changes[from]; }
       }
       if (Array.isArray(changes.entities) && changes.entities.some((e: Args) => e && 'type' in e)) changes.entities = toEntities(changes.entities);
-      store.updateFeature(a.feature_id, changes);
+      // Edge / face / plane / axis picks become stored references, as when the feature was made.
+      store.updateFeature(a.feature_id, await convertPicks(ctx, a.feature_id, changes));
       return result(ctx, a.feature_id);
     }
     case 'delete_feature': {

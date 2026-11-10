@@ -101,6 +101,17 @@ self.onmessage = async (ev: MessageEvent<{ id: number; req: KernelRequest }>) =>
         }
         break;
       }
+      case 'topologyBefore': {
+        const idx = req.doc.features.findIndex((f) => f.id === req.featureId);
+        if (idx < 0) throw new Error('Feature not found');
+        // Rebuilt like a preview base: caller-owned shapes, freed right away; model.current is untouched.
+        let before: RegenResult | null = null;
+        try {
+          before = regenerate(oc, { ...req.doc, rollback: idx }, { topology: true, solver: await getSolver() });
+          result = before.topology ?? null;
+        } finally { releaseRegen(before); }
+        break;
+      }
       case 'info': result = entityInfo(oc, need(), req.ref.kind, req.ref.index); break;
       case 'distance': result = minDistance(oc, need(), req.a, req.b); break;
       case 'exportStep': {

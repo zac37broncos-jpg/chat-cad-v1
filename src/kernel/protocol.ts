@@ -24,6 +24,8 @@ export type KernelRequest =
    * position. Returns the model just before it (base) and its tool body.
    */
   | { op: 'preview'; doc: CadDocument; featureId: string; topology?: boolean }
+  /** Face names and edges of the part just before `featureId` (the part it is applied to). Leaves the current shape alone. */
+  | { op: 'topologyBefore'; doc: CadDocument; featureId: string }
   | { op: 'info'; ref: SubRef }
   | { op: 'distance'; a: SubRef; b: SubRef }
   /**
@@ -61,6 +63,7 @@ export interface PreviewResponse { base: MeshData | null; tool: MeshData | null;
 
 export type KernelResponseMap = {
   preview: PreviewResponse;
+  topologyBefore: Topology | null;
   regen: RegenResponse;
   info: EntityInfo;
   distance: { distance: number; p1: [number, number, number]; p2: [number, number, number] };
