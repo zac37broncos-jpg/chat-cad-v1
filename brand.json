@@ -1,0 +1,7 @@
+{
+  "_comment": "The product's identity in ONE place. The app, the Claude bridge, the dev server and the tests read this file. The launcher keeps a copy of name, repo and port as constants (it runs before the app is downloaded); tests/brand.test.ts fails if they drift apart. To rename the product: change it here and in launcher/chad-launcher.mjs, then run npm test.",
+  "name": "CHAD",
+  "fileExtension": ".chad.json",
+  "port": 5180,
+  "repo": "zac37broncos-jpg/chat-cad-v1"
+}

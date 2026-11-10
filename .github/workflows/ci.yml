@@ -1,0 +1,96 @@
+# Automatic checks for every pull request and for main.
+# A pull request is merged only when this workflow is green.
+# Nothing here signs in to Claude or spends Claude usage: tests use fake Claude processes only.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# A newer push to the same PR cancels the older run (saves Actions minutes).
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Typecheck, tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          # Current Node.js LTS, the version the README asks for.
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+
+  smoke:
+    name: Browser smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # Browser binaries are cached by Playwright version (package-lock.json pins it).
+      - uses: actions/cache@v6
+        id: pw-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: Smoke test (real Chromium, fake Claude path, no Claude usage)
+        run: npm run smoke
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: smoke-failure
+          path: |
+            smoke-results
+            smoke-report
+          retention-days: 7
+
+  bench:
+    # Timings only, never fails on speed. Runs on main (and on demand) to keep a history; PRs compare locally.
+    name: Benchmarks (report only)
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run bench
+      - uses: actions/upload-artifact@v7
+        with:
+          name: bench-results
+          path: bench-results
+          retention-days: 90

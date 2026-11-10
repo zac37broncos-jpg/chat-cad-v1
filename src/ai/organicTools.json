@@ -1,0 +1,376 @@
+[
+  {
+    "name": "loft_sections",
+    "description": "Smooth organic body in ONE step: makes one sketch per cross-section (named '<name> Section 1', '2', ...) and a smooth loft through them named <name>. Sections lie in planes parallel to 'plane' at their 'offset' along its normal (XY: offset = world Z, section x,y = world X,Y; XZ: offset moves toward FRONT (-Y), section x,y = world X,Z; YZ: offset = world X, section x,y = world Y,Z). Each section is an oval {cx,cy,rx,ry,squareness?,rotation?} or a closed spline 'points' [[x,y],...] (use points for shapes an oval cannot make, e.g. a head section with a jaw, cheekbones or a flat back; give every points section 24 points counter-clockwise starting at +x, the same count as an oval, so the loft is exact and light). Use 4-12 sections, closer together where the shape changes fast. start_point / end_point [x,y,z] close the body with a smooth dome to that point (top of a head, nose tip, tail): two dome sections '<name> End Dome 1/2' are added automatically. start_tip / end_tip 'point' makes a sharp tip instead. For a main body prefer profile_body. Every section stays an editable sketch.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "plane": {
+          "type": "string",
+          "enum": [
+            "XY",
+            "XZ",
+            "YZ"
+          ],
+          "description": "Default XY (sections stacked up the Z axis)."
+        },
+        "sections": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "offset": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "oval": {
+                "type": "object",
+                "properties": {
+                  "cx": {
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  },
+                  "cy": {
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  },
+                  "rx": {
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  },
+                  "ry": {
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  },
+                  "squareness": {
+                    "type": "number"
+                  },
+                  "rotation": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "rx",
+                  "ry"
+                ]
+              },
+              "points": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "minItems": 3
+              }
+            },
+            "required": [
+              "offset"
+            ]
+          }
+        },
+        "start_point": {
+          "type": "array",
+          "items": {
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Close the body past the first section with a smooth dome (or a tip) ending at this point [x, y, z]. For a round dome put it at least about half the section's half-size beyond the section; closer looks like a flat lid."
+        },
+        "end_point": {
+          "type": "array",
+          "items": {
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Close the body past the last section with a smooth dome (or a tip) ending at this point [x, y, z]. For a round dome put it at least about half the section's half-size beyond the section; closer looks like a flat lid."
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "new",
+            "add",
+            "cut"
+          ],
+          "description": "Default: new for the first solid, else add. cut carves it out of the part (eye sockets, mouth)."
+        },
+        "start_tip": {
+          "type": "string",
+          "enum": [
+            "round",
+            "point"
+          ],
+          "description": "Default round (dome)."
+        },
+        "end_tip": {
+          "type": "string",
+          "enum": [
+            "round",
+            "point"
+          ],
+          "description": "Default round (dome)."
+        }
+      },
+      "required": [
+        "name",
+        "sections"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "profile_body",
+    "description": "Sculpt a smooth body from its SILHOUETTES, the way a sculptor blocks out a figure from front and side views. The body runs along 'axis' (Z = upright: heads, torsos, statues, vases; Y = front-to-back: animal bodies, snouts, boats; X = left-to-right). Give 'stations' along that axis; each station may give the world extents of the body there: for axis Z, x (width: half-size or [left, right]) and y ([front, back], front is -Y, so a brow, nose ridge or chin that juts forward has a more negative front value); for axis Y, x and z ([bottom, top]); for axis X, y and z. A station can give only some values (e.g. only the brow's front y): every quantity is interpolated smoothly and without overshoot through the stations that give it, so the front profile and the side profile can have their own key points. squareness per station (2 = round, 3-5 = soft block, like carved stone or a muscular chest); front_squareness (axis Z) or bottom_squareness (axes X, Y) for the lower half of the section only (e.g. a flat face on a rounder head). It makes evenly spaced section sketches '<name> Section 1..n' (detail = about how many along the body, default 14) and one smooth loft '<name>'. start / end: 'flat' (default), 'round' (a dome; start_dome/end_dome sets its height) or 'point'. Every section stays an editable sketch.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "axis": {
+          "type": "string",
+          "enum": [
+            "Z",
+            "Y",
+            "X"
+          ],
+          "description": "Default Z (upright)."
+        },
+        "stations": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 40,
+          "items": {
+            "type": "object",
+            "properties": {
+              "at": {
+                "type": "number",
+                "description": "Position along the axis (world Z for axis Z, world Y for axis Y, world X for axis X)."
+              },
+              "x": {
+                "type": [
+                  "number",
+                  "array"
+                ],
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2,
+                "maxItems": 2,
+                "description": "Half-size centered on 0, or [min, max] in world coordinates."
+              },
+              "y": {
+                "type": [
+                  "number",
+                  "array"
+                ],
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2,
+                "maxItems": 2,
+                "description": "Half-size centered on 0, or [min, max] in world coordinates."
+              },
+              "z": {
+                "type": [
+                  "number",
+                  "array"
+                ],
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2,
+                "maxItems": 2,
+                "description": "Half-size centered on 0, or [min, max] in world coordinates."
+              },
+              "squareness": {
+                "type": "number",
+                "minimum": 1.5,
+                "maximum": 12
+              },
+              "front_squareness": {
+                "type": "number",
+                "minimum": 1.5,
+                "maximum": 12
+              },
+              "bottom_squareness": {
+                "type": "number",
+                "minimum": 1.5,
+                "maximum": 12
+              }
+            },
+            "required": [
+              "at"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "squareness": {
+          "type": "number",
+          "minimum": 1.5,
+          "maximum": 12,
+          "description": "Default for stations that do not give one (default 2.5)."
+        },
+        "front_squareness": {
+          "type": "number",
+          "minimum": 1.5,
+          "maximum": 12
+        },
+        "bottom_squareness": {
+          "type": "number",
+          "minimum": 1.5,
+          "maximum": 12
+        },
+        "detail": {
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 40,
+          "description": "About how many sections along the body (default 14); every station also gets a section."
+        },
+        "start": {
+          "type": "string",
+          "enum": [
+            "flat",
+            "round",
+            "point"
+          ]
+        },
+        "end": {
+          "type": "string",
+          "enum": [
+            "flat",
+            "round",
+            "point"
+          ]
+        },
+        "start_dome": {
+          "type": "number",
+          "description": "How far the round or pointed end reaches past the first station (document units). Default: 0.6 x the smaller half-size of that end's section, a natural round dome. For a round crown or snout keep it at least about half of that half-size: a much lower dome looks like a flat lid with a crease around it."
+        },
+        "end_dome": {
+          "type": "number",
+          "description": "How far the round or pointed end reaches past the last station (document units). Default: 0.6 x the smaller half-size of that end's section, a natural round dome. For a round crown or snout keep it at least about half of that half-size: a much lower dome looks like a flat lid with a crease around it."
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "new",
+            "add",
+            "cut"
+          ],
+          "description": "Default: add to the part (or new body if empty). 'cut' carves the shape out."
+        }
+      },
+      "required": [
+        "name",
+        "stations"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "tube",
+    "description": "Smooth round limb in ONE step: arms, legs, fingers, necks, tails, horns, handles, hair strands. Give the centerline 'path' as world points [[x,y,z],...] (2-10 points, document units, spaced at least ~1.5x the radius in bends) and a radius, or 'radii' (one per path point) to taper and bulge it. Makes a circular section sketch at every path point, square to the path (named '<name> Section k'), and one smooth loft named <name>. ends: 'round' (default, domed caps), 'flat', or 'point' (tapers to a tip: claws, horns, fingertips). operation add (default once a solid exists) / new / cut (grooves, channels).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "minItems": 2,
+          "maxItems": 30
+        },
+        "radius": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "radii": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "ends": {
+          "type": "string",
+          "enum": [
+            "round",
+            "flat",
+            "point"
+          ]
+        },
+        "start_end": {
+          "type": "string",
+          "enum": [
+            "round",
+            "flat",
+            "point"
+          ],
+          "description": "Overrides 'ends' at the first path point (e.g. 'flat' where it joins the body)."
+        },
+        "finish_end": {
+          "type": "string",
+          "enum": [
+            "round",
+            "flat",
+            "point"
+          ],
+          "description": "Overrides 'ends' at the last path point."
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "new",
+            "add",
+            "cut"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "path"
+      ],
+      "additionalProperties": false
+    }
+  }
+]

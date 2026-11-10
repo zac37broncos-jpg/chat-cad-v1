@@ -1,0 +1,1769 @@
+# Independent print verification: results
+
+Written by `verify/print/check_parts.py`. Tools:
+
+- python: 3.13.18
+- numpy: 2.5.4
+- trimesh: 5.2.0
+- manifold3d: 3.5.4
+- admesh: ADMesh - version 0.98.5
+- prusa-slicer: PrusaSlicer-2.7.2+UNKNOWN based on Slic3r (with GUI support)
+- OCP (OpenCascade for Python, cadquery-ocp): 7.8.1.1.post1
+- pymeshlab: 2025.7.post1
+
+| Part | Checks passed | Fine STL deviation (mm) | Worst hole error (mm) | Thinnest wall p1 (mm) | Slices |
+|---|---|---|---|---|---|
+| Plate with holes (4 x 2 x 0.5 in) | 85/85 | 0.0008 | 0.0008 | 10.151 | yes, 63 layers, 1h 55m 4s |
+| Block with R0.25 rounds and a 0.1 chamfer (4 x 2 x 1 in) | 76/76 | 0.0036 | - | 23.501 | yes, 127 layers, 2h 38m 57s |
+| Ø4 in flange, six #10 holes on a Ø3 bolt circle | 85/85 | 0.0050 | 0.0007 | 6.350 | yes, 32 layers, 2h 12m 56s |
+| Revolved ring (torus R1 x r0.25 in) | 76/76 | 0.0065 | - | 12.695 | yes, 317 layers, 1h 4m 57s |
+| L mounting bracket (demo part, mm) | 85/85 | 0.0026 | 0.0026 | 7.144 | yes, 290 layers, 3h 13m 6s |
+| Hole gauge: Ø1 to Ø12 and an M6 counterbore (mm) | 85/85 | 0.0014 | 0.0014 | 4.000 | yes, 50 layers, 52m 41s |
+| Countersink #10 and tapped 1/4-20 blind hole (4 x 2 x 1 in) | 85/85 | 0.0033 | 0.0007 | 22.630 | yes, 127 layers, 2h 56m 0s |
+| Shelled box, open top, 0.1 in walls (4 x 3 x 2 in) | 76/76 | 0.0000 | - | 2.540 | yes, 254 layers, 5h 7m 23s |
+| Thin-wall cup, open top, 0.8 mm walls (40 x 30 x 20 mm) | 76/76 | 0.0000 | - | 0.800 | yes, 100 layers, 27m 12s |
+| Drafted boss (1 in cube, 5° draft) | 76/76 | 0.0000 | - | 1.778 | yes, 127 layers, 26m 28s |
+| Swept rod: Ø0.2 in along a line and an R2 arc | 73/73 | 0.0060 | - | 5.078 | yes, 394 layers, 37m 44s |
+| Plate with a skipped hole pattern and a mirrored boss (in) | 85/85 | 0.0009 | 0.0009 | 12.700 | yes, 190 layers, 5h 54m 25s |
+| Organic figure from the chat (spline loft, nose, blend fillet, mm) | 66/66 | 0.0099 | - | 6.999 | yes, 274 layers, 41m 11s |
+| Sculpted body with an arm tube (chat sculpting tools, in) | 66/66 | 0.0099 | - | 10.247 | yes, 434 layers, 3h 17m 21s |
+| Easter Island head (chat example, as built today) | 66/66 | 0.0098 | - | 8.134 | yes, 777 layers, 6h 21m 2s |
+| Easter Island head (recorded hard seams) | 65/66 | 0.0174 | - | 8.220 | yes, 777 layers, 6h 21m 5s |
+| Cartoon bear (chat example, as built today) | 66/66 | 0.0099 | - | 6.386 | yes, 563 layers, 4h 34m 14s |
+| Cartoon bear (recorded hard seams) | 66/66 | 0.0099 | - | 6.423 | yes, 563 layers, 4h 34m 29s |
+| Desk organiser (CHAD demo part, 150 x 80 x 90 mm) | 76/76 | 0.0014 | - | 2.000 | yes, 450 layers, 12h 12m 16s |
+| Phone stand with a 20° lean from an angle formula (mm) | 85/85 | 0.0012 | 0.0012 | 5.638 | yes, 530 layers, 3h 43m 16s |
+| Vase: revolved spline profile, shelled 2 mm, open top (mm) | 66/66 | 0.0100 | - | 1.993 | yes, 321 layers, 2h 51m 20s |
+
+## Plate with holes (4 x 2 x 0.5 in)
+
+Covers: scale (4 in = 101.6 mm), sketch cut through all, small holes
+
+- PASS B-rep volume = hand calculation: model 64743.8579 mm³ vs hand 64743.8579 mm³ (rel 2.2e-16)
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 3.937007874016e-09
+- PASS STEP ap214-in.step: volume = model: 64743.8579 mm³ (rel 4.5e-16)
+- PASS STEP ap214-in.step: volume = hand calculation: rel 6.7e-16
+- PASS STEP ap214-in.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap214-in.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap214-in.step: every hole is an exact cylinder of the design size, on its axis: max radius error 0.0e+00 mm, missing 0
+- PASS STEP ap214-in.step: hole radii in the file text (no CAD library): max 0.0e+00 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap214-mm.step: volume = model: 64743.8579 mm³ (rel 4.5e-16)
+- PASS STEP ap214-mm.step: volume = hand calculation: rel 6.7e-16
+- PASS STEP ap214-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: every hole is an exact cylinder of the design size, on its axis: max radius error 0.0e+00 mm, missing 0
+- PASS STEP ap214-mm.step: hole radii in the file text (no CAD library): max 0.0e+00 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap242-mm.step: volume = model: 64743.8579 mm³ (rel 4.5e-16)
+- PASS STEP ap242-mm.step: volume = hand calculation: rel 6.7e-16
+- PASS STEP ap242-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: every hole is an exact cylinder of the design size, on its axis: max radius error 0.0e+00 mm, missing 0
+- PASS STEP ap242-mm.step: hole radii in the file text (no CAD library): max 0.0e+00 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 5.72e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 404 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 64746.1501 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 2, design 2
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 2
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.599998 x 50.799999 x 12.700000
+- PASS STL draft-mm-binary.stl: volume = hand calculation within area x tolerance: 64746.150 vs 64743.858 mm³: off 2.292 mm³ = 0.0035% (bound 728.7 mm³)
+- PASS STL draft-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00680 mm, exact→STL 0.00680 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00680 mm = 0.000268 in
+- PASS STL draft-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00680 mm; missing []
+- PASS STL draft-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 9.525 mm: min 9.531, p1 10.188, median 12.700 mm
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 1940 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 64743.9469 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 2, design 2
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 2
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.599998 x 50.799999 x 12.700000
+- PASS STL extra-mm-binary.stl: volume = hand calculation within area x tolerance: 64743.947 vs 64743.858 mm³: off 0.089 mm³ = 0.0001% (bound 72.9 mm³)
+- PASS STL extra-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00027 mm, exact→STL 0.00028 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00028 mm = 0.000011 in
+- PASS STL extra-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00028 mm; missing []
+- PASS STL extra-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 9.525 mm: min 9.525, p1 10.227, median 12.700 mm
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 1172 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 64744.1130 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 2, design 2
+- PASS STL fine-in-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 1172 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 64744.1102 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 2, design 2
+- PASS STL fine-mm-ascii.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 1172 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 64744.1102 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 2, design 2
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 2
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.599998 x 50.799999 x 12.700000
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 63, top Z 12.6, 1h 55m 4s, filament 8761.86 mm, messages []
+- PASS STL fine-mm-binary.stl: volume = hand calculation within area x tolerance: 64744.110 vs 64743.858 mm³: off 0.252 mm³ = 0.0004% (bound 145.7 mm³)
+- PASS STL fine-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00076 mm, exact→STL 0.00076 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00076 mm = 0.000030 in
+- PASS STL fine-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00076 mm; missing []
+- PASS STL fine-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 9.525 mm: min 9.527, p1 10.151, median 12.700 mm
+
+## Block with R0.25 rounds and a 0.1 chamfer (4 x 2 x 1 in)
+
+Covers: fillets (cylinders), chamfer following tangent edges
+
+- PASS B-rep volume = hand calculation: model 129286.4421 mm³ vs hand 129286.4421 mm³ (rel 5.6e-16)
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 3.937007874016e-09
+- PASS STEP ap214-in.step: volume = model: 129286.4421 mm³ (rel 1.2e-14)
+- PASS STEP ap214-in.step: volume = hand calculation: rel 1.1e-14
+- PASS STEP ap214-in.step: size = model: max corner difference 7.11e-15 mm
+- PASS STEP ap214-in.step: size = hand calculation: max corner difference 7.11e-15 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap214-mm.step: volume = model: 129286.4421 mm³ (rel 1.2e-14)
+- PASS STEP ap214-mm.step: volume = hand calculation: rel 1.1e-14
+- PASS STEP ap214-mm.step: size = model: max corner difference 3.55e-15 mm
+- PASS STEP ap214-mm.step: size = hand calculation: max corner difference 7.11e-15 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap242-mm.step: volume = model: 129286.4421 mm³ (rel 1.2e-14)
+- PASS STEP ap242-mm.step: volume = hand calculation: rel 1.1e-14
+- PASS STEP ap242-mm.step: size = model: max corner difference 3.55e-15 mm
+- PASS STEP ap242-mm.step: size = hand calculation: max corner difference 7.11e-15 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 6.25e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 404 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 129276.8622 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.599998 x 50.799999 x 25.400000
+- PASS STL draft-mm-binary.stl: volume = hand calculation within area x tolerance: 129276.862 vs 129286.442 mm³: off 9.580 mm³ = 0.0074% (bound 863.6 mm³)
+- PASS STL draft-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.02622 mm, exact→STL 0.02602 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.02622 mm = 0.001032 in
+- note STL draft-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 50.800 mm: min 22.860, p1 23.506, median 25.400 mm
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 2620 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 129286.0262 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.599998 x 50.799999 x 25.400000
+- PASS STL extra-mm-binary.stl: volume = hand calculation within area x tolerance: 129286.026 vs 129286.442 mm³: off 0.416 mm³ = 0.0003% (bound 86.4 mm³)
+- PASS STL extra-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00149 mm, exact→STL 0.00144 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00149 mm = 0.000059 in
+- note STL extra-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 50.800 mm: min 22.865, p1 23.558, median 25.400 mm
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 1316 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 129285.3380 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-in-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 1316 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 129285.3332 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-ascii.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 1316 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 129285.3332 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.599998 x 50.799999 x 25.400000
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 127, top Z 25.4, 2h 38m 57s, filament 15081.64 mm, messages []
+- PASS STL fine-mm-binary.stl: volume = hand calculation within area x tolerance: 129285.333 vs 129286.442 mm³: off 1.109 mm³ = 0.0009% (bound 172.7 mm³)
+- PASS STL fine-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00363 mm, exact→STL 0.00353 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00363 mm = 0.000143 in
+- note STL fine-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 50.800 mm: min 22.897, p1 23.501, median 25.400 mm
+
+## Ø4 in flange, six #10 holes on a Ø3 bolt circle
+
+Covers: hole, circular pattern, round outline
+
+- PASS B-rep volume = hand calculation: model 50538.5773 mm³ vs hand 50538.5773 mm³ (rel 2.0e-15)
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 3.937007874016e-09
+- PASS STEP ap214-in.step: volume = model: 50538.5773 mm³ (rel 2.6e-14)
+- PASS STEP ap214-in.step: volume = hand calculation: rel 2.4e-14
+- PASS STEP ap214-in.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap214-in.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap214-in.step: every hole is an exact cylinder of the design size, on its axis: max radius error 0.0e+00 mm, missing 0
+- PASS STEP ap214-in.step: hole radii in the file text (no CAD library): max 0.0e+00 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap214-mm.step: volume = model: 50538.5773 mm³ (rel 2.6e-14)
+- PASS STEP ap214-mm.step: volume = hand calculation: rel 2.4e-14
+- PASS STEP ap214-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: every hole is an exact cylinder of the design size, on its axis: max radius error 4.4e-16 mm, missing 0
+- PASS STEP ap214-mm.step: hole radii in the file text (no CAD library): max 4.4e-16 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap242-mm.step: volume = model: 50538.5773 mm³ (rel 2.6e-14)
+- PASS STEP ap242-mm.step: volume = hand calculation: rel 2.4e-14
+- PASS STEP ap242-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: every hole is an exact cylinder of the design size, on its axis: max radius error 4.4e-16 mm, missing 0
+- PASS STEP ap242-mm.step: hole radii in the file text (no CAD library): max 4.4e-16 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 3.08e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 1576 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 50508.0674 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 6, design 6
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 6
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.575424 x 101.587715 x 6.350000
+- PASS STL draft-mm-binary.stl: volume = hand calculation within area x tolerance: 50508.067 vs 50538.577 mm³: off 30.510 mm³ = 0.0604% (bound 930.3 mm³)
+- PASS STL draft-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.02457 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.02457 mm, exact→STL 0.02457 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.02457 mm = 0.000967 in
+- PASS STL draft-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00601 mm; missing []
+- PASS STL draft-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 6.350 mm: min 6.350, p1 6.350, median 6.350 mm
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 7048 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 50535.3134 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 6, design 6
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 6
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.597504 x 101.598755 x 6.350000
+- PASS STL extra-mm-binary.stl: volume = hand calculation within area x tolerance: 50535.313 vs 50538.577 mm³: off 3.264 mm³ = 0.0065% (bound 93.1 mm³)
+- PASS STL extra-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00250 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00250 mm, exact→STL 0.00250 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00250 mm = 0.000098 in
+- PASS STL extra-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00024 mm; missing []
+- PASS STL extra-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 6.350 mm: min 6.350, p1 6.350, median 6.350 mm
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 4372 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 50532.1251 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 6, design 6
+- PASS STL fine-in-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 4372 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 50532.1245 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 6, design 6
+- PASS STL fine-mm-ascii.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 4372 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 50532.1245 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 6, design 6
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 6
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.599998 x 101.599998 x 6.350000
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 32, top Z 6.4, 2h 12m 56s, filament 8416.83 mm, messages []
+- PASS STL fine-mm-binary.stl: volume = hand calculation within area x tolerance: 50532.124 vs 50538.577 mm³: off 6.453 mm³ = 0.0128% (bound 186.1 mm³)
+- PASS STL fine-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00500 mm, exact→STL 0.00500 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00500 mm = 0.000197 in
+- PASS STL fine-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00067 mm; missing []
+- PASS STL fine-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 6.350 mm: min 6.350, p1 6.350, median 6.350 mm
+
+## Revolved ring (torus R1 x r0.25 in)
+
+Covers: revolve, doubly curved surface (torus)
+
+- PASS B-rep volume = hand calculation: model 20216.7299 mm³ vs hand 20216.7299 mm³ (rel 2.2e-15)
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 3.937007874016e-09
+- PASS STEP ap214-in.step: volume = model: 20216.7299 mm³ (rel 0.0e+00)
+- PASS STEP ap214-in.step: volume = hand calculation: rel 2.2e-15
+- PASS STEP ap214-in.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap214-in.step: size = hand calculation: max corner difference 1.00e-07 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap214-mm.step: volume = model: 20216.7299 mm³ (rel 0.0e+00)
+- PASS STEP ap214-mm.step: volume = hand calculation: rel 2.2e-15
+- PASS STEP ap214-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: size = hand calculation: max corner difference 1.00e-07 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap242-mm.step: volume = model: 20216.7299 mm³ (rel 0.0e+00)
+- PASS STEP ap242-mm.step: volume = hand calculation: rel 2.2e-15
+- PASS STEP ap242-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: size = hand calculation: max corner difference 1.00e-07 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 2.43e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 7680 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 20138.3256 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 1
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 63.500000 x 12.700000 x 63.500000
+- PASS STL draft-mm-binary.stl: volume = hand calculation within area x tolerance: 20138.326 vs 20216.730 mm³: off 78.404 mm³ = 0.3878% (bound 317.9 mm³)
+- PASS STL draft-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.03800 mm, exact→STL 0.03800 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.03800 mm = 0.001496 in
+- note STL draft-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 12.700 mm: min 12.663, p1 12.663, median 12.670 mm
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 120480 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 20212.3096 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 1
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 63.497513 x 12.700000 x 63.498756
+- PASS STL extra-mm-binary.stl: volume = hand calculation within area x tolerance: 20212.310 vs 20216.730 mm³: off 4.420 mm³ = 0.0219% (bound 31.8 mm³)
+- PASS STL extra-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00249 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00300 mm, exact→STL 0.00295 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00300 mm = 0.000118 in
+- PASS STL extra-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 12.700 mm: min 12.698, p1 12.698, median 12.699 mm
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 51264 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 20206.1187 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL fine-in-binary.stl: size = hand calculation within tolerance: max corner difference 0.00494 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 51264 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 20206.1186 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL fine-mm-ascii.stl: size = hand calculation within tolerance: max corner difference 0.00495 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 51264 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 20206.1186 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 1
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 63.500000 x 12.700000 x 63.490108
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 317, top Z 63.4, 1h 4m 57s, filament 3471.1 mm, messages ['print warning: Detected print stability issues:']
+- PASS STL fine-mm-binary.stl: volume = hand calculation within area x tolerance: 20206.119 vs 20216.730 mm³: off 10.611 mm³ = 0.0525% (bound 63.7 mm³)
+- PASS STL fine-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00495 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00646 mm, exact→STL 0.00645 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00646 mm = 0.000254 in
+- PASS STL fine-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 12.700 mm: min 12.695, p1 12.695, median 12.696 mm
+
+## L mounting bracket (demo part, mm)
+
+Covers: parameters, linear pattern of ISO holes, hole on a vertical wall, fillet between two bodies
+
+- PASS B-rep volume = hand calculation: model 84636.7227 mm³ vs hand 84636.7227 mm³ (rel 1.7e-16)
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 3.937007874016e-09
+- PASS STEP ap214-in.step: volume = model: 84636.7227 mm³ (rel 9.7e-13)
+- PASS STEP ap214-in.step: volume = hand calculation: rel 9.7e-13
+- PASS STEP ap214-in.step: size = model: max corner difference 1.14e-11 mm
+- PASS STEP ap214-in.step: size = hand calculation: max corner difference 1.14e-11 mm
+- PASS STEP ap214-in.step: every hole is an exact cylinder of the design size, on its axis: max radius error 1.2e-11 mm, missing 0
+- PASS STEP ap214-in.step: hole radii in the file text (no CAD library): max 1.2e-11 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap214-mm.step: volume = model: 84636.7227 mm³ (rel 9.6e-15)
+- PASS STEP ap214-mm.step: volume = hand calculation: rel 9.5e-15
+- PASS STEP ap214-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: every hole is an exact cylinder of the design size, on its axis: max radius error 0.0e+00 mm, missing 0
+- PASS STEP ap214-mm.step: hole radii in the file text (no CAD library): max 0.0e+00 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap242-mm.step: volume = model: 84636.7227 mm³ (rel 9.6e-15)
+- PASS STEP ap242-mm.step: volume = hand calculation: rel 9.5e-15
+- PASS STEP ap242-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: every hole is an exact cylinder of the design size, on its axis: max radius error 0.0e+00 mm, missing 0
+- PASS STEP ap242-mm.step: hole radii in the file text (no CAD library): max 0.0e+00 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 6.44e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 1048 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 84656.5912 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 5, design 5
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 5
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 100.000000 x 60.000000 x 58.000000
+- PASS STL draft-mm-binary.stl: volume = hand calculation within area x tolerance: 84656.591 vs 84636.723 mm³: off 19.869 mm³ = 0.0235% (bound 1265.1 mm³)
+- PASS STL draft-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.02355 mm, exact→STL 0.02355 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.02355 mm = 0.000927 in
+- PASS STL draft-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.02355 mm; missing []
+- note STL draft-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 8.000 mm: min 6.710, p1 7.157, median 8.000 mm
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 5080 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 84637.5182 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 5, design 5
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 5
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 100.000000 x 60.000000 x 58.000000
+- PASS STL extra-mm-binary.stl: volume = hand calculation within area x tolerance: 84637.518 vs 84636.723 mm³: off 0.795 mm³ = 0.0009% (bound 126.5 mm³)
+- PASS STL extra-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00094 mm, exact→STL 0.00094 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00094 mm = 0.000037 in
+- PASS STL extra-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00094 mm; missing []
+- note STL extra-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 8.000 mm: min 6.701, p1 7.347, median 8.000 mm
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 3064 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 84638.9459 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 5, design 5
+- PASS STL fine-in-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 3064 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 84638.9319 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 5, design 5
+- PASS STL fine-mm-ascii.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 3064 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 84638.9319 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 5, design 5
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 5
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 100.000000 x 60.000000 x 58.000000
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 290, top Z 58.0, 3h 13m 6s, filament 13551.1 mm, messages []
+- PASS STL fine-mm-binary.stl: volume = hand calculation within area x tolerance: 84638.932 vs 84636.723 mm³: off 2.209 mm³ = 0.0026% (bound 253.0 mm³)
+- PASS STL fine-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00262 mm, exact→STL 0.00262 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00262 mm = 0.000103 in
+- PASS STL fine-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00262 mm; missing []
+- note STL fine-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 8.000 mm: min 6.700, p1 7.144, median 8.000 mm
+
+## Hole gauge: Ø1 to Ø12 and an M6 counterbore (mm)
+
+Covers: small holes (worst case for STL flats), counterbore
+
+- PASS B-rep volume = hand calculation: model 15689.7984 mm³ vs hand 15689.7984 mm³ (rel 0.0e+00)
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 3.937007874016e-09
+- PASS STEP ap214-in.step: volume = model: 15689.7984 mm³ (rel 5.1e-13)
+- PASS STEP ap214-in.step: volume = hand calculation: rel 5.1e-13
+- PASS STEP ap214-in.step: size = model: max corner difference 1.08e-11 mm
+- PASS STEP ap214-in.step: size = hand calculation: max corner difference 1.08e-11 mm
+- PASS STEP ap214-in.step: every hole is an exact cylinder of the design size, on its axis: max radius error 1.2e-11 mm, missing 0
+- PASS STEP ap214-in.step: hole radii in the file text (no CAD library): max 1.2e-11 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap214-mm.step: volume = model: 15689.7984 mm³ (rel 8.0e-15)
+- PASS STEP ap214-mm.step: volume = hand calculation: rel 8.0e-15
+- PASS STEP ap214-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: every hole is an exact cylinder of the design size, on its axis: max radius error 0.0e+00 mm, missing 0
+- PASS STEP ap214-mm.step: hole radii in the file text (no CAD library): max 0.0e+00 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap242-mm.step: volume = model: 15689.7984 mm³ (rel 8.0e-15)
+- PASS STEP ap242-mm.step: volume = hand calculation: rel 8.0e-15
+- PASS STEP ap242-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: every hole is an exact cylinder of the design size, on its axis: max radius error 0.0e+00 mm, missing 0
+- PASS STEP ap242-mm.step: hole radii in the file text (no CAD library): max 0.0e+00 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 6.29e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 1380 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 15696.3905 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 6, design 6
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 6
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 90.000000 x 20.000000 x 10.000000
+- PASS STL draft-mm-binary.stl: volume = hand calculation within area x tolerance: 15696.390 vs 15689.798 mm³: off 6.592 mm³ = 0.0420% (bound 324.3 mm³)
+- PASS STL draft-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.01285 mm, exact→STL 0.01285 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.01285 mm = 0.000506 in
+- PASS STL draft-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.01285 mm; missing []
+- PASS STL draft-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 4.000 mm: min 4.000, p1 4.000, median 10.000 mm
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 6756 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 15690.0623 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 6, design 6
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 6
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 90.000000 x 20.000000 x 10.000000
+- PASS STL extra-mm-binary.stl: volume = hand calculation within area x tolerance: 15690.062 vs 15689.798 mm³: off 0.264 mm³ = 0.0017% (bound 32.4 mm³)
+- PASS STL extra-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00052 mm, exact→STL 0.00052 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00052 mm = 0.000020 in
+- PASS STL extra-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00052 mm; missing []
+- PASS STL extra-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 4.000 mm: min 4.000, p1 4.000, median 10.000 mm
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 4068 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 15690.5306 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 6, design 6
+- PASS STL fine-in-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 4068 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 15690.5315 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 6, design 6
+- PASS STL fine-mm-ascii.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 4068 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 15690.5315 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 6, design 6
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 6
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 90.000000 x 20.000000 x 10.000000
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 50, top Z 10.0, 52m 41s, filament 2974.23 mm, messages []
+- PASS STL fine-mm-binary.stl: volume = hand calculation within area x tolerance: 15690.531 vs 15689.798 mm³: off 0.733 mm³ = 0.0047% (bound 64.9 mm³)
+- PASS STL fine-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00143 mm, exact→STL 0.00143 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00143 mm = 0.000056 in
+- PASS STL fine-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00143 mm; missing []
+- PASS STL fine-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 4.000 mm: min 4.000, p1 4.000, median 10.000 mm
+
+## Countersink #10 and tapped 1/4-20 blind hole (4 x 2 x 1 in)
+
+Covers: cones (countersink, drill point), blind hole
+
+- PASS B-rep volume = hand calculation: model 130043.4736 mm³ vs hand 130043.4736 mm³ (rel 4.5e-16)
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 3.937007874016e-09
+- PASS STEP ap214-in.step: volume = model: 130043.4736 mm³ (rel 2.2e-15)
+- PASS STEP ap214-in.step: volume = hand calculation: rel 1.8e-15
+- PASS STEP ap214-in.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap214-in.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap214-in.step: every hole is an exact cylinder of the design size, on its axis: max radius error 0.0e+00 mm, missing 0
+- PASS STEP ap214-in.step: hole radii in the file text (no CAD library): max 0.0e+00 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap214-mm.step: volume = model: 130043.4736 mm³ (rel 2.1e-15)
+- PASS STEP ap214-mm.step: volume = hand calculation: rel 1.7e-15
+- PASS STEP ap214-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: every hole is an exact cylinder of the design size, on its axis: max radius error 4.4e-16 mm, missing 0
+- PASS STEP ap214-mm.step: hole radii in the file text (no CAD library): max 4.4e-16 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap242-mm.step: volume = model: 130043.4736 mm³ (rel 2.1e-15)
+- PASS STEP ap242-mm.step: volume = hand calculation: rel 1.7e-15
+- PASS STEP ap242-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: every hole is an exact cylinder of the design size, on its axis: max radius error 4.4e-16 mm, missing 0
+- PASS STEP ap242-mm.step: hole radii in the file text (no CAD library): max 4.4e-16 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 6.72e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 698 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 130047.1245 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 1
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.599998 x 50.799999 x 25.400000
+- PASS STL draft-mm-binary.stl: volume = hand calculation within area x tolerance: 130047.125 vs 130043.474 mm³: off 3.651 mm³ = 0.0028% (bound 935.7 mm³)
+- PASS STL draft-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.02628 mm, exact→STL 0.02621 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.02628 mm = 0.001035 in
+- PASS STL draft-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00601 mm; missing []
+- PASS STL draft-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 8.890 mm: min 7.841, p1 22.669, median 25.400 mm
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 6018 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 130043.6306 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 1
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.599998 x 50.799999 x 25.400000
+- PASS STL extra-mm-binary.stl: volume = hand calculation within area x tolerance: 130043.631 vs 130043.474 mm³: off 0.157 mm³ = 0.0001% (bound 93.6 mm³)
+- PASS STL extra-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00126 mm, exact→STL 0.00125 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00126 mm = 0.000050 in
+- PASS STL extra-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00024 mm; missing []
+- PASS STL extra-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 8.890 mm: min 7.866, p1 22.626, median 25.400 mm
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 2918 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 130043.9119 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL fine-in-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 2918 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 130043.9063 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL fine-mm-ascii.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 2918 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 130043.9063 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 1
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.599998 x 50.799999 x 25.400000
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 127, top Z 25.4, 2h 56m 0s, filament 15524.52 mm, messages []
+- PASS STL fine-mm-binary.stl: volume = hand calculation within area x tolerance: 130043.906 vs 130043.474 mm³: off 0.433 mm³ = 0.0003% (bound 187.1 mm³)
+- PASS STL fine-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00331 mm, exact→STL 0.00328 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00331 mm = 0.000130 in
+- PASS STL fine-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00067 mm; missing []
+- PASS STL fine-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 8.890 mm: min 8.040, p1 22.630, median 25.400 mm
+
+## Shelled box, open top, 0.1 in walls (4 x 3 x 2 in)
+
+Covers: shell (open top), 0.1 in walls: thin-wall check
+
+- PASS B-rep volume = hand calculation: model 62008.6502 mm³ vs hand 62008.6502 mm³ (rel 7.0e-16)
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 1.968503937008e-08
+- PASS STEP ap214-in.step: volume = model: 62008.6502 mm³ (rel 1.6e-15)
+- PASS STEP ap214-in.step: volume = hand calculation: rel 9.4e-16
+- PASS STEP ap214-in.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap214-in.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 5e-07
+- PASS STEP ap214-mm.step: volume = model: 62008.6502 mm³ (rel 2.1e-15)
+- PASS STEP ap214-mm.step: volume = hand calculation: rel 1.4e-15
+- PASS STEP ap214-mm.step: size = model: max corner difference 1.42e-14 mm
+- PASS STEP ap214-mm.step: size = hand calculation: max corner difference 1.42e-14 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 5e-07
+- PASS STEP ap242-mm.step: volume = model: 62008.6502 mm³ (rel 2.1e-15)
+- PASS STEP ap242-mm.step: volume = hand calculation: rel 1.4e-15
+- PASS STEP ap242-mm.step: size = model: max corner difference 1.42e-14 mm
+- PASS STEP ap242-mm.step: size = hand calculation: max corner difference 1.42e-14 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 4.86e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 28 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 62008.6186 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.599998 x 76.199997 x 50.799999
+- PASS STL draft-mm-binary.stl: volume = hand calculation within area x tolerance: 62008.619 vs 62008.650 mm³: off 0.032 mm³ = 0.0001% (bound 2486.4 mm³)
+- PASS STL draft-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00000 mm, exact→STL 0.00000 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00000 mm = 0.000000 in
+- PASS STL draft-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 2.540 mm: min 2.540, p1 2.540, median 2.540 mm
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 28 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 62008.6186 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.599998 x 76.199997 x 50.799999
+- PASS STL extra-mm-binary.stl: volume = hand calculation within area x tolerance: 62008.619 vs 62008.650 mm³: off 0.032 mm³ = 0.0001% (bound 248.6 mm³)
+- PASS STL extra-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00000 mm, exact→STL 0.00000 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00000 mm = 0.000000 in
+- PASS STL extra-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 2.540 mm: min 2.540, p1 2.540, median 2.540 mm
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 28 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 62008.6311 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-in-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 28 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 62008.6186 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-ascii.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 28 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 62008.6186 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 101.599998 x 76.199997 x 50.799999
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 254, top Z 50.8, 5h 7m 23s, filament 19657.28 mm, messages []
+- PASS STL fine-mm-binary.stl: volume = hand calculation within area x tolerance: 62008.619 vs 62008.650 mm³: off 0.032 mm³ = 0.0001% (bound 497.3 mm³)
+- PASS STL fine-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00000 mm, exact→STL 0.00000 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00000 mm = 0.000000 in
+- PASS STL fine-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 2.540 mm: min 2.540, p1 2.540, median 2.540 mm
+
+## Thin-wall cup, open top, 0.8 mm walls (40 x 30 x 20 mm)
+
+Covers: shell (open top), 0.8 mm walls: thin-wall check
+
+- PASS B-rep volume = hand calculation: model 3061.2480 mm³ vs hand 3061.2480 mm³ (rel 1.5e-16)
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 1.968503937008e-08
+- PASS STEP ap214-in.step: volume = model: 3061.2480 mm³ (rel 1.4e-12)
+- PASS STEP ap214-in.step: volume = hand calculation: rel 1.4e-12
+- PASS STEP ap214-in.step: size = model: max corner difference 7.60e-12 mm
+- PASS STEP ap214-in.step: size = hand calculation: max corner difference 7.60e-12 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 5e-07
+- PASS STEP ap214-mm.step: volume = model: 3061.2480 mm³ (rel 0.0e+00)
+- PASS STEP ap214-mm.step: volume = hand calculation: rel 1.5e-16
+- PASS STEP ap214-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 5e-07
+- PASS STEP ap242-mm.step: volume = model: 3061.2480 mm³ (rel 0.0e+00)
+- PASS STEP ap242-mm.step: volume = hand calculation: rel 1.5e-16
+- PASS STEP ap242-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 1.29e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 28 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 3061.2470 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 40.000000 x 30.000000 x 20.000000
+- PASS STL draft-mm-binary.stl: volume = hand calculation within area x tolerance: 3061.247 vs 3061.248 mm³: off 0.001 mm³ = 0.0000% (bound 388.3 mm³)
+- PASS STL draft-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00000 mm, exact→STL 0.00000 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00000 mm = 0.000000 in
+- PASS STL draft-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 0.800 mm: min 0.800, p1 0.800, median 0.800 mm
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 28 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 3061.2470 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 40.000000 x 30.000000 x 20.000000
+- PASS STL extra-mm-binary.stl: volume = hand calculation within area x tolerance: 3061.247 vs 3061.248 mm³: off 0.001 mm³ = 0.0000% (bound 38.8 mm³)
+- PASS STL extra-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00000 mm, exact→STL 0.00000 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00000 mm = 0.000000 in
+- PASS STL extra-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 0.800 mm: min 0.800, p1 0.800, median 0.800 mm
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 28 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 3061.2475 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-in-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 28 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 3061.2470 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-ascii.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 28 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 3061.2470 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 40.000000 x 30.000000 x 20.000000
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 100, top Z 20.0, 27m 12s, filament 1234.87 mm, messages []
+- PASS STL fine-mm-binary.stl: volume = hand calculation within area x tolerance: 3061.247 vs 3061.248 mm³: off 0.001 mm³ = 0.0000% (bound 77.7 mm³)
+- PASS STL fine-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00000 mm, exact→STL 0.00000 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00000 mm = 0.000000 in
+- PASS STL fine-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 0.800 mm: min 0.800, p1 0.800, median 0.800 mm
+
+## Drafted boss (1 in cube, 5° draft)
+
+Covers: draft, inclined planes
+
+- PASS B-rep volume = hand calculation: model 13686.9406 mm³ vs hand 13686.9406 mm³ (rel 0.0e+00)
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 3.937007874016e-09
+- PASS STEP ap214-in.step: volume = model: 13686.9406 mm³ (rel 2.0e-14)
+- PASS STEP ap214-in.step: volume = hand calculation: rel 2.0e-14
+- PASS STEP ap214-in.step: size = model: max corner difference 8.38e-13 mm
+- PASS STEP ap214-in.step: size = hand calculation: max corner difference 8.38e-13 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap214-mm.step: volume = model: 13686.9406 mm³ (rel 3.2e-14)
+- PASS STEP ap214-mm.step: volume = hand calculation: rel 3.2e-14
+- PASS STEP ap214-mm.step: size = model: max corner difference 2.24e-13 mm
+- PASS STEP ap214-mm.step: size = hand calculation: max corner difference 2.24e-13 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap242-mm.step: volume = model: 13686.9406 mm³ (rel 3.2e-14)
+- PASS STEP ap242-mm.step: volume = hand calculation: rel 3.2e-14
+- PASS STEP ap242-mm.step: size = model: max corner difference 2.24e-13 mm
+- PASS STEP ap242-mm.step: size = hand calculation: max corner difference 2.24e-13 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 4.77e-07 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 12 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 13686.9401 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 25.400000 x 25.400000 x 25.400000
+- PASS STL draft-mm-binary.stl: volume = hand calculation within area x tolerance: 13686.940 vs 13686.941 mm³: off 0.001 mm³ = 0.0000% (bound 172.4 mm³)
+- PASS STL draft-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00000 mm, exact→STL 0.00000 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00000 mm = 0.000000 in
+- note STL draft-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 20.956 mm: min 0.005, p1 1.633, median 23.821 mm
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 12 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 13686.9401 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 25.400000 x 25.400000 x 25.400000
+- PASS STL extra-mm-binary.stl: volume = hand calculation within area x tolerance: 13686.940 vs 13686.941 mm³: off 0.001 mm³ = 0.0000% (bound 17.2 mm³)
+- PASS STL extra-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00000 mm, exact→STL 0.00000 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00000 mm = 0.000000 in
+- note STL extra-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 20.956 mm: min 0.031, p1 2.396, median 23.829 mm
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 12 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 13686.9407 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-in-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 12 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 13686.9401 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-ascii.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 12 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 13686.9401 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 25.400000 x 25.400000 x 25.400000
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 127, top Z 25.4, 26m 28s, filament 2054.18 mm, messages []
+- PASS STL fine-mm-binary.stl: volume = hand calculation within area x tolerance: 13686.940 vs 13686.941 mm³: off 0.001 mm³ = 0.0000% (bound 34.5 mm³)
+- PASS STL fine-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00000 mm, exact→STL 0.00000 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00000 mm = 0.000000 in
+- note STL fine-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 20.956 mm: min 0.015, p1 1.778, median 23.809 mm
+
+## Swept rod: Ø0.2 in along a line and an R2 arc
+
+Covers: sweep (pipe) along a line and an arc
+
+- PASS B-rep volume = hand calculation: model 2132.1532 mm³ vs hand 2132.1532 mm³ (rel 2.3e-15)
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 3.937007874016e-09
+- PASS STEP ap214-in.step: volume = model: 2132.1532 mm³ (rel 1.4e-13)
+- PASS STEP ap214-in.step: volume = hand calculation: rel 1.4e-13
+- PASS STEP ap214-in.step: size = model: max corner difference 1.00e-07 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap214-mm.step: volume = model: 2132.1532 mm³ (rel 1.4e-13)
+- PASS STEP ap214-mm.step: volume = hand calculation: rel 1.4e-13
+- PASS STEP ap214-mm.step: size = model: max corner difference 1.00e-07 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap242-mm.step: volume = model: 2132.1532 mm³ (rel 1.4e-13)
+- PASS STEP ap242-mm.step: volume = hand calculation: rel 1.4e-13
+- PASS STEP ap242-mm.step: size = model: max corner difference 1.00e-07 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 4.58e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 2588 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 2125.0084 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 53.339998 x 5.080000 x 78.739998
+- PASS STL draft-mm-binary.stl: volume = hand calculation within area x tolerance: 2125.008 vs 2132.153 mm³: off 7.145 mm³ = 0.3351% (bound 85.9 mm³)
+- PASS STL draft-mm-binary.stl: size = model within tolerance: max corner difference 0.00000 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.03170 mm, exact→STL 0.03168 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.03170 mm = 0.001248 in
+- PASS STL draft-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 5.080 mm: min 0.367, p1 5.067, median 5.069 mm
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 38396 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 2131.8003 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 53.339998 x 5.080000 x 78.739998
+- PASS STL extra-mm-binary.stl: volume = hand calculation within area x tolerance: 2131.800 vs 2132.153 mm³: off 0.353 mm³ = 0.0166% (bound 8.6 mm³)
+- PASS STL extra-mm-binary.stl: size = model within tolerance: max corner difference 0.00000 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00292 mm, exact→STL 0.00289 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00292 mm = 0.000115 in
+- PASS STL extra-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 5.080 mm: min 0.696, p1 5.079, median 5.080 mm
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 16412 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 2131.2569 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-in-binary.stl: size = model within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 16412 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 2131.2569 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-ascii.stl: size = model within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 16412 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 2131.2569 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 53.339998 x 5.080000 x 78.739998
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 394, top Z 78.8, 37m 44s, filament 916.84 mm, messages ['print warning: Detected print stability issues:']
+- PASS STL fine-mm-binary.stl: volume = hand calculation within area x tolerance: 2131.257 vs 2132.153 mm³: off 0.896 mm³ = 0.0420% (bound 17.2 mm³)
+- PASS STL fine-mm-binary.stl: size = model within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00604 mm, exact→STL 0.00604 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00604 mm = 0.000238 in
+- PASS STL fine-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 5.080 mm: min 1.524, p1 5.078, median 5.079 mm
+
+## Plate with a skipped hole pattern and a mirrored boss (in)
+
+Covers: linear pattern with skip, mirror feature, separate-looking bosses on one body
+
+- PASS B-rep volume = hand calculation: model 210491.1888 mm³ vs hand 210491.1888 mm³ (rel 4.1e-16)
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 3.937007874016e-09
+- PASS STEP ap214-in.step: volume = model: 210491.1888 mm³ (rel 5.7e-15)
+- PASS STEP ap214-in.step: volume = hand calculation: rel 5.3e-15
+- PASS STEP ap214-in.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap214-in.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap214-in.step: every hole is an exact cylinder of the design size, on its axis: max radius error 0.0e+00 mm, missing 0
+- PASS STEP ap214-in.step: hole radii in the file text (no CAD library): max 0.0e+00 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap214-mm.step: volume = model: 210491.1888 mm³ (rel 6.1e-15)
+- PASS STEP ap214-mm.step: volume = hand calculation: rel 5.7e-15
+- PASS STEP ap214-mm.step: size = model: max corner difference 2.84e-14 mm
+- PASS STEP ap214-mm.step: size = hand calculation: max corner difference 2.84e-14 mm
+- PASS STEP ap214-mm.step: every hole is an exact cylinder of the design size, on its axis: max radius error 0.0e+00 mm, missing 0
+- PASS STEP ap214-mm.step: hole radii in the file text (no CAD library): max 0.0e+00 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap242-mm.step: volume = model: 210491.1888 mm³ (rel 6.1e-15)
+- PASS STEP ap242-mm.step: volume = hand calculation: rel 5.7e-15
+- PASS STEP ap242-mm.step: size = model: max corner difference 2.84e-14 mm
+- PASS STEP ap242-mm.step: size = hand calculation: max corner difference 2.84e-14 mm
+- PASS STEP ap242-mm.step: every hole is an exact cylinder of the design size, on its axis: max radius error 0.0e+00 mm, missing 0
+- PASS STEP ap242-mm.step: hole radii in the file text (no CAD library): max 0.0e+00 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 8.87e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 1024 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 210498.4197 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 5, design 5
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 5
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 152.399994 x 101.599998 x 38.099998
+- PASS STL draft-mm-binary.stl: volume = hand calculation within area x tolerance: 210498.420 vs 210491.189 mm³: off 7.231 mm³ = 0.0034% (bound 2115.7 mm³)
+- PASS STL draft-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00001 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00764 mm, exact→STL 0.00764 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00764 mm = 0.000301 in
+- PASS STL draft-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00764 mm; missing []
+- PASS STL draft-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 12.700 mm: min 12.700, p1 12.700, median 12.700 mm
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 4864 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 210491.4605 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 5, design 5
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 5
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 152.399994 x 101.599998 x 38.099998
+- PASS STL extra-mm-binary.stl: volume = hand calculation within area x tolerance: 210491.460 vs 210491.189 mm³: off 0.272 mm³ = 0.0001% (bound 211.6 mm³)
+- PASS STL extra-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00001 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00031 mm, exact→STL 0.00031 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00031 mm = 0.000012 in
+- PASS STL extra-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00031 mm; missing []
+- PASS STL extra-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 12.700 mm: min 12.700, p1 12.700, median 12.700 mm
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 2944 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 210491.9948 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 5, design 5
+- PASS STL fine-in-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 2944 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 210491.9764 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 5, design 5
+- PASS STL fine-mm-ascii.stl: size = hand calculation within tolerance: max corner difference 0.00001 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 2944 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 210491.9764 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 5, design 5
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 5
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 152.399994 x 101.599998 x 38.099998
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 190, top Z 38.0, 5h 54m 25s, filament 27680.4 mm, messages []
+- PASS STL fine-mm-binary.stl: volume = hand calculation within area x tolerance: 210491.976 vs 210491.189 mm³: off 0.788 mm³ = 0.0004% (bound 423.1 mm³)
+- PASS STL fine-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00001 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00085 mm, exact→STL 0.00085 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00085 mm = 0.000034 in
+- PASS STL fine-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00085 mm; missing []
+- PASS STL fine-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 12.700 mm: min 12.700, p1 12.700, median 12.700 mm
+
+## Organic figure from the chat (spline loft, nose, blend fillet, mm)
+
+Covers: B-spline loft to a point, boolean with a cylinder, variable blend
+
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 7.874015748031e-07
+- PASS STEP ap214-in.step: volume = model: 25531.5133 mm³ (rel 2.8e-13)
+- PASS STEP ap214-in.step: size = model: max corner difference 8.60e-12 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 2e-05
+- PASS STEP ap214-mm.step: volume = model: 25531.5133 mm³ (rel 2.5e-13)
+- PASS STEP ap214-mm.step: size = model: max corner difference 3.80e-12 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 2e-05
+- PASS STEP ap242-mm.step: volume = model: 25531.5133 mm³ (rel 2.5e-13)
+- PASS STEP ap242-mm.step: size = model: max corner difference 3.80e-12 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 4.86e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 8778 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 25465.4801 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 34.992035 x 29.488697 x 55.000000
+- PASS STL draft-mm-binary.stl: size = model within tolerance: max corner difference 0.01535 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.04876 mm, exact→STL 0.04844 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.04876 mm = 0.001920 in
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 98070 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 25525.2976 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 35.007385 x 29.488697 x 55.000000
+- PASS STL extra-mm-binary.stl: size = model within tolerance: max corner difference 0.00011 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00494 mm, exact→STL 0.00494 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00494 mm = 0.000195 in
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 48528 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 25519.4367 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-in-binary.stl: size = model within tolerance: max corner difference 0.00011 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 48528 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 25519.4368 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-ascii.stl: size = model within tolerance: max corner difference 0.00011 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 48528 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 25519.4368 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 35.007385 x 29.488697 x 55.000000
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 274, top Z 54.8, 41m 11s, filament 3448.39 mm, messages []
+- PASS STL fine-mm-binary.stl: size = model within tolerance: max corner difference 0.00011 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00986 mm, exact→STL 0.00983 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00986 mm = 0.000388 in
+
+## Sculpted body with an arm tube (chat sculpting tools, in)
+
+Covers: free-form faces joined along a curve (hardest case for meshing)
+
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 3.937007874016e-07
+- PASS STEP ap214-in.step: volume = model: 177596.8098 mm³ (rel 2.4e-13)
+- PASS STEP ap214-in.step: size = model: max corner difference 8.46e-12 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 1e-05
+- PASS STEP ap214-mm.step: volume = model: 177596.8098 mm³ (rel 6.1e-14)
+- PASS STEP ap214-mm.step: size = model: max corner difference 6.67e-12 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 1e-05
+- PASS STEP ap242-mm.step: volume = model: 177596.8098 mm³ (rel 6.1e-14)
+- PASS STEP ap242-mm.step: size = model: max corner difference 6.67e-12 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 6.77e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 18966 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 177374.8874 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 78.111954 x 48.260002 x 86.867996
+- PASS STL draft-mm-binary.stl: size = model within tolerance: max corner difference 0.01258 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.04937 mm, exact→STL 0.04823 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.04937 mm = 0.001944 in
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 176938 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 177573.4095 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 78.124069 x 48.260002 x 86.867996
+- PASS STL extra-mm-binary.stl: size = model within tolerance: max corner difference 0.00046 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00494 mm, exact→STL 0.00491 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00494 mm = 0.000194 in
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 92764 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 177551.5392 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-in-binary.stl: size = model within tolerance: max corner difference 0.00230 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 92764 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 177551.5394 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-ascii.stl: size = model within tolerance: max corner difference 0.00230 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 92764 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 177551.5394 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 78.122622 x 48.256088 x 86.867996
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 434, top Z 86.8, 3h 17m 21s, filament 19869.75 mm, messages []
+- PASS STL fine-mm-binary.stl: size = model within tolerance: max corner difference 0.00230 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00986 mm, exact→STL 0.00967 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00986 mm = 0.000388 in
+
+## Easter Island head (chat example, as built today)
+
+Covers: the chat's worked organic example as the chat builds it today: many lofts, mirrors, booleans
+
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 1.968503937008e-06
+- PASS STEP ap214-in.step: volume = model: 357259.0984 mm³ (rel 4.5e-09)
+- PASS STEP ap214-in.step: size = model: max corner difference 9.81e-13 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 5e-05
+- PASS STEP ap214-mm.step: volume = model: 357259.0984 mm³ (rel 4.5e-09)
+- PASS STEP ap214-mm.step: size = model: max corner difference 6.67e-12 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 5e-05
+- PASS STEP ap242-mm.step: volume = model: 357259.0984 mm³ (rel 4.5e-09)
+- PASS STEP ap242-mm.step: size = model: max corner difference 6.67e-12 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 1.35e-05 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 71688 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 357009.0570 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 68.580002 x 60.935562 x 155.327454
+- PASS STL draft-mm-binary.stl: size = model within tolerance: max corner difference 0.02553 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.04062 mm, exact→STL 0.04076 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.04076 mm = 0.001605 in
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 713272 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 357229.3945 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 68.580002 x 60.961113 x 155.327591
+- PASS STL extra-mm-binary.stl: size = model within tolerance: max corner difference 0.00002 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00491 mm, exact→STL 0.00483 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00491 mm = 0.000193 in
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 316736 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 357199.7042 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-in-binary.stl: size = model within tolerance: max corner difference 0.00056 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 316736 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 357199.7023 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-ascii.stl: size = model within tolerance: max corner difference 0.00055 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 316736 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 357199.7023 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 68.580002 x 60.961067 x 155.327057
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 777, top Z 155.4, 6h 21m 2s, filament 39607.73 mm, messages ['print warning: Detected print stability issues:']
+- PASS STL fine-mm-binary.stl: size = model within tolerance: max corner difference 0.00055 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00976 mm, exact→STL 0.00963 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00976 mm = 0.000384 in
+
+## Easter Island head (recorded hard seams)
+
+Covers: the chat's worked organic example with the seams of a build that once failed (hard case): many lofts, mirrors, booleans
+
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 3.937007874016e-05
+- PASS STEP ap214-in.step: volume = model: 357259.0980 mm³ (rel 2.5e-09)
+- PASS STEP ap214-in.step: size = model: max corner difference 9.81e-13 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 0.001
+- PASS STEP ap214-mm.step: volume = model: 357259.0980 mm³ (rel 2.5e-09)
+- PASS STEP ap214-mm.step: size = model: max corner difference 6.67e-12 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 0.001
+- PASS STEP ap242-mm.step: volume = model: 357259.0980 mm³ (rel 2.5e-09)
+- PASS STEP ap242-mm.step: size = model: max corner difference 6.67e-12 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 1.34e-05 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 85458 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 356986.0483 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 68.580002 x 60.961082 x 155.325867
+- PASS STL draft-mm-binary.stl: size = model within tolerance: max corner difference 0.00174 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.04824 mm, exact→STL 0.04737 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.04824 mm = 0.001899 in
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 679844 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 357222.7564 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 68.580002 x 60.961124 x 155.323898
+- PASS STL extra-mm-binary.stl: size = model within tolerance: max corner difference 0.00371 mm (tolerance 0.005 mm)
+- **FAIL** STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.01256 mm, exact→STL 0.01512 mm; setting 0.005 mm; promise 0.127 mm; 1 points over the setting away from joints (largest 0.00862 mm)
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.01512 mm = 0.000595 in
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 270364 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 357179.1869 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-in-binary.stl: size = model within tolerance: max corner difference 0.00382 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 270364 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 357179.1857 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-ascii.stl: size = model within tolerance: max corner difference 0.00382 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 270364 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 357179.1857 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 68.580002 x 60.961113 x 155.323792
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 777, top Z 155.4, 6h 21m 5s, filament 39613.53 mm, messages ['print warning: Detected print stability issues:']
+- PASS STL fine-mm-binary.stl: size = model within tolerance: max corner difference 0.00382 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting (away from joints): STL→exact 0.00987 mm, exact→STL 0.01745 mm; setting 0.01 mm; promise 0.127 mm; all 56 points over the setting are within one triangle of a file corner that is itself off the exact surface by at least the excess (largest 0.0190 mm): the file follows the model's joint edge there, the model's own accuracy, as the app's Note says
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.01745 mm = 0.000687 in
+
+## Cartoon bear (chat example, as built today)
+
+Covers: the chat's worked organic example as the chat builds it today: many lofts, mirrors, booleans
+
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 1.968503937008e-06
+- PASS STEP ap214-in.step: volume = model: 247487.7179 mm³ (rel 3.3e-07)
+- PASS STEP ap214-in.step: size = model: max corner difference 8.46e-12 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 5e-05
+- PASS STEP ap214-mm.step: volume = model: 247487.7179 mm³ (rel 3.3e-07)
+- PASS STEP ap214-mm.step: size = model: max corner difference 3.33e-12 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 5e-05
+- PASS STEP ap242-mm.step: volume = model: 247487.7179 mm³ (rel 3.3e-07)
+- PASS STEP ap242-mm.step: size = model: max corner difference 3.33e-12 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 9.73e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 47600 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 247163.2625 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 67.053680 x 65.524956 x 112.522003
+- PASS STL draft-mm-binary.stl: size = model within tolerance: max corner difference 0.00704 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.04871 mm, exact→STL 0.04852 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.04871 mm = 0.001918 in
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 478260 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 247453.2631 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 67.056000 x 65.531998 x 112.522003
+- PASS STL extra-mm-binary.stl: size = model within tolerance: max corner difference 0.00000 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00494 mm, exact→STL 0.00488 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00494 mm = 0.000194 in
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 237234 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 247422.2815 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-in-binary.stl: size = model within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 237234 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 247422.2813 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-ascii.stl: size = model within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 237234 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 247422.2813 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 67.056000 x 65.531998 x 112.522003
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 563, top Z 112.6, 4h 34m 14s, filament 27778.16 mm, messages ['print warning: Detected print stability issues:']
+- PASS STL fine-mm-binary.stl: size = model within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00992 mm, exact→STL 0.00987 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00992 mm = 0.000391 in
+
+## Cartoon bear (recorded hard seams)
+
+Covers: the chat's worked organic example with the seams of a build that once failed (hard case): many lofts, mirrors, booleans
+
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 7.874015748031e-07
+- PASS STEP ap214-in.step: volume = model: 247487.7099 mm³ (rel 3.5e-07)
+- PASS STEP ap214-in.step: size = model: max corner difference 8.46e-12 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 2e-05
+- PASS STEP ap214-mm.step: volume = model: 247487.7099 mm³ (rel 3.5e-07)
+- PASS STEP ap214-mm.step: size = model: max corner difference 3.32e-12 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 2e-05
+- PASS STEP ap242-mm.step: volume = model: 247487.7099 mm³ (rel 3.5e-07)
+- PASS STEP ap242-mm.step: size = model: max corner difference 3.32e-12 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 9.73e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 47750 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 247163.5952 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 67.048744 x 65.523560 x 112.522003
+- PASS STL draft-mm-binary.stl: size = model within tolerance: max corner difference 0.00844 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.04875 mm, exact→STL 0.04914 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.04914 mm = 0.001935 in
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 484370 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 247453.3835 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 67.056000 x 65.531998 x 112.522003
+- PASS STL extra-mm-binary.stl: size = model within tolerance: max corner difference 0.00000 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00492 mm, exact→STL 0.00492 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00492 mm = 0.000194 in
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 237180 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 247422.4070 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-in-binary.stl: size = model within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 237180 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 247422.4068 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-ascii.stl: size = model within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 237180 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 247422.4068 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 67.056000 x 65.531998 x 112.522003
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 563, top Z 112.6, 4h 34m 29s, filament 27777.94 mm, messages ['print warning: Detected print stability issues:']
+- PASS STL fine-mm-binary.stl: size = model within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00992 mm, exact→STL 0.00991 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00992 mm = 0.000391 in
+
+## Desk organiser (CHAD demo part, 150 x 80 x 90 mm)
+
+Covers: parameters with formulas, outside and inside corner rounds, pocket cut, dividers fused flush with the walls and top
+
+- PASS B-rep volume = hand calculation: model 154399.7516 mm³ vs hand 154399.7516 mm³ (rel 2.5e-15)
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 3.937007874016e-09
+- PASS STEP ap214-in.step: volume = model: 154399.7516 mm³ (rel 1.7e-12)
+- PASS STEP ap214-in.step: volume = hand calculation: rel 1.7e-12
+- PASS STEP ap214-in.step: size = model: max corner difference 1.02e-11 mm
+- PASS STEP ap214-in.step: size = hand calculation: max corner difference 1.02e-11 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap214-mm.step: volume = model: 154399.7516 mm³ (rel 1.0e-13)
+- PASS STEP ap214-mm.step: volume = hand calculation: rel 1.0e-13
+- PASS STEP ap214-mm.step: size = model: max corner difference 2.52e-29 mm
+- PASS STEP ap214-mm.step: size = hand calculation: max corner difference 8.88e-16 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap242-mm.step: volume = model: 154399.7516 mm³ (rel 1.0e-13)
+- PASS STEP ap242-mm.step: volume = hand calculation: rel 1.0e-13
+- PASS STEP ap242-mm.step: size = model: max corner difference 2.52e-29 mm
+- PASS STEP ap242-mm.step: size = hand calculation: max corner difference 8.88e-16 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 1.15e-05 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 450 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 154381.2903 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 150.000000 x 80.000000 x 90.000000
+- PASS STL draft-mm-binary.stl: volume = hand calculation within area x tolerance: 154381.290 vs 154399.752 mm³: off 18.461 mm³ = 0.0120% (bound 6384.6 mm³)
+- PASS STL draft-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.01285 mm, exact→STL 0.01285 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.01285 mm = 0.000506 in
+- PASS STL draft-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 2.000 mm: min 2.000, p1 2.000, median 2.400 mm
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 1982 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 154398.9588 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 150.000000 x 80.000000 x 90.000000
+- PASS STL extra-mm-binary.stl: volume = hand calculation within area x tolerance: 154398.959 vs 154399.752 mm³: off 0.793 mm³ = 0.0005% (bound 638.5 mm³)
+- PASS STL extra-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00052 mm, exact→STL 0.00052 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00052 mm = 0.000021 in
+- PASS STL extra-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 2.000 mm: min 2.000, p1 2.000, median 2.400 mm
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 1218 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 154397.6222 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-in-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 1218 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 154397.6175 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-ascii.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 1218 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 154397.6175 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 150.000000 x 80.000000 x 90.000000
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 450, top Z 90.0, 12h 12m 16s, filament 52025.99 mm, messages []
+- PASS STL fine-mm-binary.stl: volume = hand calculation within area x tolerance: 154397.618 vs 154399.752 mm³: off 2.134 mm³ = 0.0014% (bound 1277.0 mm³)
+- PASS STL fine-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00143 mm, exact→STL 0.00143 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00143 mm = 0.000056 in
+- PASS STL fine-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 2.000 mm: min 2.000, p1 2.000, median 2.400 mm
+
+## Phone stand with a 20° lean from an angle formula (mm)
+
+Covers: angle parameter and tan() in sketch coordinates, slanted faces, mid-plane extrudes, a hole through the base
+
+- PASS B-rep volume = hand calculation: model 83528.7611 mm³ vs hand 83528.7611 mm³ (rel 5.2e-16)
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 3.937007874016e-09
+- PASS STEP ap214-in.step: volume = model: 83528.7611 mm³ (rel 7.6e-13)
+- PASS STEP ap214-in.step: volume = hand calculation: rel 7.6e-13
+- PASS STEP ap214-in.step: size = model: max corner difference 1.24e-11 mm
+- PASS STEP ap214-in.step: size = hand calculation: max corner difference 1.24e-11 mm
+- PASS STEP ap214-in.step: every hole is an exact cylinder of the design size, on its axis: max radius error 5.4e-12 mm, missing 0
+- PASS STEP ap214-in.step: hole radii in the file text (no CAD library): max 5.4e-12 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap214-mm.step: volume = model: 83528.7611 mm³ (rel 1.0e-12)
+- PASS STEP ap214-mm.step: volume = hand calculation: rel 1.0e-12
+- PASS STEP ap214-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap214-mm.step: every hole is an exact cylinder of the design size, on its axis: max radius error 0.0e+00 mm, missing 0
+- PASS STEP ap214-mm.step: hole radii in the file text (no CAD library): max 0.0e+00 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 1e-07
+- PASS STEP ap242-mm.step: volume = model: 83528.7611 mm³ (rel 1.0e-12)
+- PASS STEP ap242-mm.step: volume = hand calculation: rel 1.0e-12
+- PASS STEP ap242-mm.step: size = model: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: size = hand calculation: max corner difference 0.00e+00 mm
+- PASS STEP ap242-mm.step: every hole is an exact cylinder of the design size, on its axis: max radius error 0.0e+00 mm, missing 0
+- PASS STEP ap242-mm.step: hole radii in the file text (no CAD library): max 0.0e+00 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 2.34e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 240 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 83530.1065 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 1
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 90.000000 x 70.000000 x 106.000000
+- PASS STL draft-mm-binary.stl: volume = hand calculation within area x tolerance: 83530.107 vs 83528.761 mm³: off 1.345 mm³ = 0.0016% (bound 1608.5 mm³)
+- PASS STL draft-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.01071 mm, exact→STL 0.01071 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.01071 mm = 0.000421 in
+- PASS STL draft-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.01071 mm; missing []
+- PASS STL draft-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 5.638 mm: min 0.066, p1 5.638, median 6.000 mm
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 1008 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 83528.8158 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 1
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 90.000000 x 70.000000 x 106.000000
+- PASS STL extra-mm-binary.stl: volume = hand calculation within area x tolerance: 83528.816 vs 83528.761 mm³: off 0.055 mm³ = 0.0001% (bound 160.8 mm³)
+- PASS STL extra-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00043 mm, exact→STL 0.00043 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00043 mm = 0.000017 in
+- PASS STL extra-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00043 mm; missing []
+- PASS STL extra-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 5.638 mm: min 0.055, p1 5.638, median 6.000 mm
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 624 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 83528.9160 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL fine-in-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 624 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 83528.9114 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL fine-mm-ascii.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 624 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 83528.9114 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 1, design 1
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 1
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 90.000000 x 70.000000 x 106.000000
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 530, top Z 106.0, 3h 43m 16s, filament 15241.29 mm, messages []
+- PASS STL fine-mm-binary.stl: volume = hand calculation within area x tolerance: 83528.911 vs 83528.761 mm³: off 0.150 mm³ = 0.0002% (bound 321.7 mm³)
+- PASS STL fine-mm-binary.stl: size = hand calculation within tolerance: max corner difference 0.00000 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00119 mm, exact→STL 0.00119 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00119 mm = 0.000047 in
+- PASS STL fine-mm-binary.stl: holes found and within tolerance (cut and measured): worst radial error 0.00119 mm; missing []
+- PASS STL fine-mm-binary.stl: thinnest wall (ray cast, 1st percentile) vs design 5.638 mm: min 0.020, p1 5.638, median 6.000 mm
+
+## Vase: revolved spline profile, shelled 2 mm, open top (mm)
+
+Covers: revolve of a B-spline (surface of revolution), shell (offset) of a free-form face
+
+- PASS STEP ap214-in.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-in.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit in, solids 1, precision 1.968503937008e-07
+- PASS STEP ap214-in.step: volume = model: 26373.2007 mm³ (rel 2.6e-09)
+- PASS STEP ap214-in.step: size = model: max corner difference 8.60e-12 mm
+- PASS STEP ap214-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap214-mm.step: header, schema and unit (text): schema AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }, unit mm, solids 1, precision 5e-06
+- PASS STEP ap214-mm.step: volume = model: 26373.2007 mm³ (rel 2.6e-09)
+- PASS STEP ap214-mm.step: size = model: max corner difference 1.78e-13 mm
+- PASS STEP ap242-mm.step: one valid closed solid (OpenCascade 7.8, Python): solids 1, valid True, open edges 0, edges used by 3+ faces 0
+- PASS STEP ap242-mm.step: header, schema and unit (text): schema AP242_MANAGED_MODEL_BASED_3D_ENGINEERING_MIM_LF {1 0 10303 442 1 1 4 }, unit mm, solids 1, precision 5e-06
+- PASS STEP ap242-mm.step: volume = model: 26373.2007 mm³ (rel 2.6e-09)
+- PASS STEP ap242-mm.step: size = model: max corner difference 1.78e-13 mm
+- PASS STL fine-mm-ascii: same triangles as the mm binary file (bit for bit): same count True, max difference 0.00e+00 mm
+- PASS STL fine-in-binary: same triangles as the mm binary file (x 25.4, float rounding): same count True, max difference 6.63e-06 mm
+- PASS STL draft-mm-binary.stl: file well-formed (own parser): 19196 triangles, binary
+- PASS STL draft-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL draft-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL draft-mm-binary.stl: outward (positive volume): 26355.9755 mm³
+- PASS STL draft-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL draft-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL draft-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL draft-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL draft-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL draft-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 64.105919 x 72.000000 x 64.088875
+- PASS STL draft-mm-binary.stl: size = model within tolerance: max corner difference 0.01754 mm (tolerance 0.05 mm)
+- PASS STL draft-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.04829 mm, exact→STL 0.04776 mm; setting 0.05 mm; promise 0.127 mm
+- PASS STL draft-mm-binary.stl: surface deviation within the 0.005 in promise: 0.04829 mm = 0.001901 in
+- PASS STL extra-mm-binary.stl: file well-formed (own parser): 189848 triangles, binary
+- PASS STL extra-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL extra-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL extra-mm-binary.stl: outward (positive volume): 26369.4579 mm³
+- PASS STL extra-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL extra-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL extra-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL extra-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL extra-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL extra-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 64.123756 x 72.000000 x 64.123756
+- PASS STL extra-mm-binary.stl: size = model within tolerance: max corner difference 0.00010 mm (tolerance 0.005 mm)
+- PASS STL extra-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00495 mm, exact→STL 0.00482 mm; setting 0.005 mm; promise 0.127 mm
+- PASS STL extra-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00495 mm = 0.000195 in
+- PASS STL fine-in-binary.stl: file well-formed (own parser): 107160 triangles, binary
+- PASS STL fine-in-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-in-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-in-binary.stl: outward (positive volume): 26368.5873 mm³
+- PASS STL fine-in-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-in-binary.stl: size = model within tolerance: max corner difference 0.00069 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-ascii.stl: file well-formed (own parser): 107160 triangles, ascii
+- PASS STL fine-mm-ascii.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-ascii.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-ascii.stl: outward (positive volume): 26368.5862 mm³
+- PASS STL fine-mm-ascii.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-ascii.stl: size = model within tolerance: max corner difference 0.00069 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: file well-formed (own parser): 107160 triangles, binary
+- PASS STL fine-mm-binary.stl: closed, manifold, consistently oriented (own edge count): open 0, non-manifold 0, misoriented 0, degenerate 0
+- PASS STL fine-mm-binary.stl: stored normals match the winding: min cos 1.000000
+- PASS STL fine-mm-binary.stl: outward (positive volume): 26368.5862 mm³
+- PASS STL fine-mm-binary.stl: through holes (Euler) = design: genus 0, design 0
+- PASS STL fine-mm-binary.stl: trimesh watertight / winding / volume: {"is_watertight": true, "is_winding_consistent": true, "is_volume": true, "bodies": 1}
+- PASS STL fine-mm-binary.stl: Manifold library accepts it as a solid: status NoError, genus 0
+- PASS STL fine-mm-binary.stl: MeshLab: no boundary or non-manifold edges, no self-intersections: boundary 0, non-manifold edges 0, vertices 0, self-intersecting faces 0, pieces 1
+- PASS STL fine-mm-binary.stl: ADMesh finds nothing to repair: {"Number of parts": 1, "Degenerate facets": 0, "Edges fixed": 0, "Facets removed": 0, "Facets added": 0, "Facets reversed": 0, "Backwards edges": 0, "Normals fixed": 0, "Disconnected facets": 0}
+- PASS STL fine-mm-binary.stl: PrusaSlicer reads it as manifold, one part: manifold yes, parts 1, size 64.122581 x 72.000000 x 64.122581
+- PASS STL fine-mm-binary.stl: PrusaSlicer slices it to G-code: layers 321, top Z 64.2, 2h 51m 20s, filament 10664.34 mm, messages ['print warning: Detected print stability issues:']
+- PASS STL fine-mm-binary.stl: size = model within tolerance: max corner difference 0.00069 mm (tolerance 0.01 mm)
+- PASS STL fine-mm-binary.stl: surface deviation (two-sided Hausdorff) within the setting: STL→exact 0.00995 mm, exact→STL 0.00977 mm; setting 0.01 mm; promise 0.127 mm
+- PASS STL fine-mm-binary.stl: surface deviation within the 0.005 in promise: 0.00995 mm = 0.000392 in

@@ -1,0 +1,117 @@
+[
+  {
+    "name": "build_model",
+    "description": "Run many modelling steps in ONE call (write each step flat: {\"tool\": \"tube\", \"name\": \"Left Arm\", \"path\": [...], ...}, the tool's own arguments next to \"tool\"): the fast way to build a whole model or a large region. Each step is {tool, args} using any other modelling tool (set_part_name, set_units, set_material, set_parameter, create_sketch, add_to_sketch, extrude, revolve, update_feature, delete_feature, fillet, chamfer, hole, linear_pattern, circular_pattern, mirror, shell, draft, rib, sweep, loft, loft_sections, tube, reference_plane, reference_axis, reference_point) with exactly the arguments that tool takes. Every step still becomes a normal, named, editable feature in the tree. Refer to earlier steps by the NAME you gave them (sketch_id: 'Head Section 3', profile_sketch_ids: ['Head Section 1', ...], features: ['Left Ear']); give every sketch and feature a unique descriptive name. Pick edges/faces with {feature: name} or {between: [nameA, nameB]} instead of get_topology indices. The part regenerates once at the end (plus only when a step needs edges/faces). Stops at the first failing step unless stop_on_error is false. Returns, for every feature made: ok or the kernel error, and its size and center; plus the exact mass properties and bounding box, and the part quality check (one solid, closed, watertight STL, clean STEP for CAM, flat base, overhangs).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 400,
+          "items": {
+            "type": "object",
+            "properties": {
+              "tool": {
+                "type": "string",
+                "description": "Name of the tool to run, e.g. 'create_sketch', 'profile_body', 'fillet'. The tool's arguments go next to it in the same object."
+              },
+              "args": {
+                "type": "object",
+                "description": "Optional: the tool's arguments nested here instead of next to 'tool'."
+              }
+            },
+            "required": [
+              "tool"
+            ],
+            "additionalProperties": true
+          }
+        },
+        "stop_on_error": {
+          "type": "boolean",
+          "description": "Default true: stop at the first step that throws (what ran stays; fix it and send the remaining steps)."
+        },
+        "check": {
+          "type": "boolean",
+          "description": "Default true: finish with the part quality check (the same as check_part) in the report."
+        }
+      },
+      "required": [
+        "steps"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "view_model",
+    "description": "LOOK at the part: returns shaded renders (PNG images) of the current model from the views you ask for, fitted to the part. Front = looking at the -Y face (the model's face/front), right = from +X, top = from +Z; three_quarter = front-right from slightly above (the most telling single view of a figure or head). Use it after every build_model stage of a whole object and critique the images like an art director: silhouette, proportions against the real subject, whether details read clearly, anything lumpy, stuck-on, floating or boxy. Then fix with update_feature / more features and look again. Cheap: a few seconds.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "views": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "front",
+              "back",
+              "left",
+              "right",
+              "top",
+              "bottom",
+              "iso",
+              "three_quarter",
+              "three_quarter_left",
+              "three_quarter_back",
+              "below"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 6,
+          "description": "Default [\"front\", \"right\", \"three_quarter\"]."
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 256,
+          "maximum": 1024,
+          "description": "Image width and height in pixels. Default 640."
+        },
+        "edges": {
+          "type": "boolean",
+          "description": "Draw face boundary edges (default true). Turn off to judge pure surface smoothness."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "get_reference",
+    "description": "Reference library for whole objects. Call it FIRST when the user asks for a recognizable subject (\"an Easter Island head\", \"a cartoon bear\", a figurine, an animal, a character, a statue). Returns a reference sheet (the real subject's proportions, the signature details people recognize it by, and the common mistakes that make a model look wrong), the modelling technique, and for subjects in the library a tested worked example: build_model steps scaled to the height you ask for, in the document's units (one solid, every feature named, prints and exports cleanly). If the subject is not in the library it says so: then research it on the web (WebSearch / WebFetch) and write your own reference sheet before modelling. Also has general guides: 'figure proportions' and 'printable part'.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string",
+          "description": "What the user asked for, in their words, e.g. 'easter island head', 'teddy bear', 'printable part'."
+        },
+        "height": {
+          "type": "number",
+          "description": "Overall height of the model in document units, to scale the worked example (default: the example's own size)."
+        }
+      },
+      "required": [
+        "subject"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "check_part",
+    "description": "Is the part a GOOD part to 3D print and to send to CNC/CAM? Checks the exact model: exactly one solid (no floating pieces), valid and closed, the STL mesh watertight, the STEP export reading back as the same solid, no tiny slivers or nearly-touching features, a flat base to stand on (and the centre of mass over it), and how much overhangs past 45 degrees (needs supports). build_model runs it at the end of every build. Fix every problem it lists before you finish, and tell the user about warnings that matter (supports needed, no flat base).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    }
+  }
+]

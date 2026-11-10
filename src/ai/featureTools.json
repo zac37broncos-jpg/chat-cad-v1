@@ -1,0 +1,308 @@
+[
+  {
+    "name": "get_topology",
+    "description": "List the faces and edges of the current solid by index, with a readable name for each face (which feature and sketch entity made it), surface/curve type, position (document units) and which faces each edge joins. Use it to pick edges/faces for fillet, chamfer, shell, draft and holes. Indices are only valid until the next change, so call this right before the feature that uses them. The features store stable references, so later edits keep the selection.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "feature_id": { "type": "string", "description": "Only faces made or modified by this feature, and edges touching them." },
+        "include_edges": { "type": "boolean", "description": "Default true." }
+      },
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "fillet",
+    "description": "Round edges with an exact rolling-ball fillet. kind 'constant' (default): one radius on every edge in 'edges' and every edge of every face in 'faces'. kind 'variable': radius changes linearly along each edge from 'radius' at the end nearest 'start_point' to 'radius2'. kind 'face': blend where face set 'faces' meets face set 'faces2'. Tangent-continuous edges are included automatically. Returns ok/errors and the new exact volume.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "kind": { "type": "string", "enum": ["constant", "variable", "face"] },
+        "edges": { "$ref": "#/$defs/edges" },
+        "faces": { "$ref": "#/$defs/faces" },
+        "faces2": { "$ref": "#/$defs/faces" },
+        "radius": { "$ref": "#/$defs/value" },
+        "radius2": { "$ref": "#/$defs/value" },
+        "start_point": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3, "description": "Variable fillet: a point (document units) nearest the edge end that gets 'radius'." },
+        "name": { "type": "string" }
+      },
+      "required": ["radius"],
+      "additionalProperties": false,
+      "$defs": {
+        "value": { "type": ["number", "string"], "description": "Number in document units or an expression, e.g. 0.125, '3 mm', 'R/2'. Angles in formulas need a unit: cos(lean_angle) where lean_angle is defined as '20 deg', or cos(20 deg); never cos(20) or a parameter defined as plain 20. Do not write 'name deg' for a parameter that already has a unit. Multiplying two lengths is not supported." },
+        "edges": { "type": "array", "description": "Edges: {index} from get_topology; 'selection' for the user's selected edges; {feature: '<feature name or id>'} for every edge of the faces that feature made; {between: ['<feature A>', '<feature B>']} for every edge where A's faces meet B's (e.g. where a nose joins the head). Feature selectors need no get_topology call and work inside build_model.", "items": { "type": ["object", "string"], "properties": { "index": { "type": "integer" }, "feature": { "type": "string" }, "between": { "type": "array", "items": { "type": "string" }, "minItems": 2, "maxItems": 2 } } } },
+        "faces": { "type": "array", "description": "Faces: {index} from get_topology; 'selection'; or {feature: '<feature name or id>'} for every face that feature made.", "items": { "type": ["object", "string"], "properties": { "index": { "type": "integer" }, "feature": { "type": "string" } } } }
+      }
+    }
+  },
+  {
+    "name": "chamfer",
+    "description": "Bevel edges. Equal distance by default; give distance2 for two different distances, or angle (degrees) for distance-angle. Distance 1 is measured on the first face listed for the edge in get_topology (faces[0]); flip:true swaps. 'faces' chamfers every edge of those faces.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "edges": { "type": "array", "description": "Same forms as fillet edges ({index}, 'selection', {feature}, {between}).", "items": { "type": ["object", "string"], "properties": { "index": { "type": "integer" }, "feature": { "type": "string" }, "between": { "type": "array", "items": { "type": "string" } } } } },
+        "faces": { "type": "array", "items": { "type": ["object", "string"], "properties": { "index": { "type": "integer" }, "feature": { "type": "string" } } } },
+        "distance": { "type": ["number", "string"] },
+        "distance2": { "type": ["number", "string"] },
+        "angle": { "type": ["number", "string"] },
+        "flip": { "type": "boolean" },
+        "name": { "type": "string" }
+      },
+      "required": ["distance"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "hole",
+    "description": "Hole: standard holes from inch (ANSI) and metric (ISO) screw tables. hole_type: 'simple' (clearance hole for a screw size), 'counterbore' (socket head cap screw), 'countersink' (flat head: 82 deg inch, 90 deg metric), 'tapped' (tap drill size, thread recorded for drawings). standard 'ansi-inch' sizes like '#10', '1/4' (tapped: '1/4-20', '10-32'); 'iso-metric' sizes like 'M6' (tapped: 'M6' coarse or 'M8x1' fine). fit: close/normal/loose (inch has close/normal). end: 'through' or 'blind' (blind needs depth; tapped blind defaults to thread depth 2x diameter plus 3 pitches of drill run-out). placement: a base plane {plane:'XY'|'XZ'|'YZ', offset} (the hole goes against the plane normal, so put an XY plane at the top face's height), a planar face {face:{index}} (the hole goes into the material), or {ref_plane_id}. points: hole centers [[x,y],...]. On a face, points are world coordinates: (X,Y) for faces facing up/down, (X,Z) for front/back, (Y,Z) for left/right. Override any table value with diameter, cbore_diameter, cbore_depth, csk_diameter, csk_angle. Use list_hole_sizes to see sizes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "hole_type": { "type": "string", "enum": ["simple", "counterbore", "countersink", "tapped"] },
+        "standard": { "type": "string", "enum": ["ansi-inch", "iso-metric"] },
+        "size": { "type": "string" },
+        "fit": { "type": "string", "enum": ["close", "normal", "loose"] },
+        "end": { "type": "string", "enum": ["through", "blind"] },
+        "depth": { "type": ["number", "string"] },
+        "thread_depth": { "type": ["number", "string"] },
+        "drill_point_angle": { "type": ["number", "string"], "description": "Blind holes, degrees (default 118, 0 = flat bottom)." },
+        "diameter": { "type": ["number", "string"] },
+        "cbore_diameter": { "type": ["number", "string"] },
+        "cbore_depth": { "type": ["number", "string"] },
+        "csk_diameter": { "type": ["number", "string"] },
+        "csk_angle": { "type": ["number", "string"] },
+        "placement": {
+          "type": "object",
+          "properties": {
+            "plane": { "type": "string", "enum": ["XY", "XZ", "YZ"] },
+            "offset": { "type": ["number", "string"] },
+            "face": { "type": ["object", "string"], "properties": { "index": { "type": "integer" } } },
+            "ref_plane_id": { "type": "string" }
+          }
+        },
+        "points": { "type": "array", "items": { "type": "array", "items": { "type": ["number", "string"] }, "minItems": 2, "maxItems": 2 }, "minItems": 1 },
+        "flip": { "type": "boolean" },
+        "name": { "type": "string" }
+      },
+      "required": ["hole_type", "standard", "size", "end", "placement", "points"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "list_hole_sizes",
+    "description": "List the standard sizes available for a hole type, and (with size) the exact table values that would be used.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "standard": { "type": "string", "enum": ["ansi-inch", "iso-metric"] },
+        "hole_type": { "type": "string", "enum": ["simple", "counterbore", "countersink", "tapped"] },
+        "size": { "type": "string" },
+        "fit": { "type": "string", "enum": ["close", "normal", "loose"] }
+      },
+      "required": ["standard", "hole_type"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "linear_pattern",
+    "description": "Copy features (extrudes, cuts, revolves, holes, sweeps, lofts, ribs) along one or two directions. count includes the original. Directions: 'X' | 'Y' | 'Z', {edge:{index}} (along a straight edge), {face:{index}} (along a planar face's normal), or {ref_axis_id}. body:true copies the whole part instead of features. skip: [[i,j],...] instance positions to leave out (0-based, [0,0] is the original).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "features": { "type": "array", "items": { "type": "string" } },
+        "body": { "type": "boolean" },
+        "direction1": { "type": ["string", "object"] },
+        "spacing1": { "type": ["number", "string"] },
+        "count1": { "type": ["integer", "string"] },
+        "flip1": { "type": "boolean" },
+        "direction2": { "type": ["string", "object"] },
+        "spacing2": { "type": ["number", "string"] },
+        "count2": { "type": ["integer", "string"] },
+        "flip2": { "type": "boolean" },
+        "skip": { "type": "array", "items": { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 } },
+        "name": { "type": "string" }
+      },
+      "required": ["direction1", "spacing1", "count1"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "circular_pattern",
+    "description": "Copy features around an axis. count includes the original. angle: total angle (default 360) with equal spacing; with equal_spacing:false, angle is the step between copies. axis: 'X' | 'Y' | 'Z' (through the origin), {face:{index}} (a cylindrical face's axis), {edge:{index}} (a circular edge's axis or a straight edge), or {ref_axis_id}.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "features": { "type": "array", "items": { "type": "string" } },
+        "body": { "type": "boolean" },
+        "axis": { "type": ["string", "object"] },
+        "count": { "type": ["integer", "string"] },
+        "angle": { "type": ["number", "string"] },
+        "equal_spacing": { "type": "boolean" },
+        "flip": { "type": "boolean" },
+        "skip": { "type": "array", "items": { "type": "integer" } },
+        "name": { "type": "string" }
+      },
+      "required": ["axis", "count"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "mirror",
+    "description": "Mirror features (or the whole body with body:true, joined to the original) about a plane: {plane:'XY'|'XZ'|'YZ', offset}, {face:{index}} (planar face) or {ref_plane_id}.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "features": { "type": "array", "items": { "type": "string" } },
+        "body": { "type": "boolean" },
+        "plane": { "type": "object" },
+        "name": { "type": "string" }
+      },
+      "required": ["plane"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "shell",
+    "description": "Hollow the part with a uniform wall thickness. open_faces are removed (e.g. the top face of a box makes an open box); with none, the part becomes a closed hollow solid. Inward by default (outside size unchanged).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "open_faces": { "type": "array", "items": { "type": ["object", "string"], "properties": { "index": { "type": "integer" } } } },
+        "thickness": { "type": ["number", "string"] },
+        "outward": { "type": "boolean" },
+        "name": { "type": "string" }
+      },
+      "required": ["thickness"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "draft",
+    "description": "Taper faces for mould release. The faces keep their size where they cross the neutral plane and get smaller along its normal (the pull direction); flip reverses. neutral_plane like mirror's plane. angle in degrees.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "faces": { "type": "array", "items": { "type": ["object", "string"], "properties": { "index": { "type": "integer" } } } },
+        "neutral_plane": { "type": "object" },
+        "angle": { "type": ["number", "string"] },
+        "flip": { "type": "boolean" },
+        "name": { "type": "string" }
+      },
+      "required": ["faces", "neutral_plane", "angle"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "rib",
+    "description": "Thin stiffening wall from a sketch of straight lines (usually one line on a plane through the middle of the part). direction 'parallel' (default): grows in the sketch plane, away from the line, until it meets the part, with the thickness across the sketch plane. 'normal': grows along the sketch normal. side: 'both' (centered, default), 'left', 'right'. flip picks the other side if the automatic one is wrong.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "sketch_id": { "type": "string" },
+        "thickness": { "type": ["number", "string"] },
+        "direction": { "type": "string", "enum": ["parallel", "normal"] },
+        "side": { "type": "string", "enum": ["both", "left", "right"] },
+        "flip": { "type": "boolean" },
+        "name": { "type": "string" }
+      },
+      "required": ["sketch_id", "thickness"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "sweep",
+    "description": "Sweep a closed profile sketch along a path sketch (a connected chain of lines/arcs/splines on another plane that starts at the profile). Or give circular_diameter instead of a profile sketch: a circle of that diameter centred on the path start, square to it (wires, rods, handles, piping, grooves). orientation: followPath (default, profile stays square to the path) or keepNormal (Keep Normal Constant: the profile keeps its starting orientation). operation new/add/cut.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "profile_sketch_id": { "type": "string" },
+        "path_sketch_id": { "type": "string" },
+        "circular_diameter": { "type": ["number", "string"] },
+        "orientation": { "type": "string", "enum": ["followPath", "keepNormal"] },
+        "operation": { "type": "string", "enum": ["new", "add", "cut"] },
+        "name": { "type": "string" }
+      },
+      "required": ["path_sketch_id"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "loft",
+    "description": "Blend smoothly through profile sketches (each one closed loop), in order. Use closed spline sections for organic shapes (one smooth face, no seams). start_point / end_point [x,y,z] close the loft to a point before the first / after the last profile (domes, rounded tips, noses). ruled:true makes straight sides. operation new/add/cut.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "profile_sketch_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "start_point": { "type": "array", "items": { "type": ["number", "string"] }, "minItems": 3, "maxItems": 3, "description": "Optional apex before the first profile, world [x,y,z] in document units." },
+        "end_point": { "type": "array", "items": { "type": ["number", "string"] }, "minItems": 3, "maxItems": 3, "description": "Optional apex after the last profile, world [x,y,z] in document units." },
+        "start_tip": { "type": "string", "enum": ["point", "round"], "description": "How the loft meets start_point: point (default, a cone-like tip) or round (a smooth dome)." },
+        "end_tip": { "type": "string", "enum": ["point", "round"], "description": "How the loft meets end_point: point (default) or round (a smooth dome)." },
+        "ruled": { "type": "boolean" },
+        "operation": { "type": "string", "enum": ["new", "add", "cut"] },
+        "name": { "type": "string" }
+      },
+      "required": ["profile_sketch_ids"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "reference_plane",
+    "description": "Create a reference plane. type 'offset': from (a plane spec like mirror's) moved by distance along its normal (flip reverses). 'angle': from rotated by angle (deg) about axis (an axis spec lying in the plane). 'three_points': points [[x,y,z]x3]. 'midplane': halfway between parallel planes a and b. 'normal_to_curve': through the start or end (at, default 'end') of the curve chain in sketch_id, square to the curve there (use it to sketch a sweep profile at a path end). 'parallel_at_point': parallel to from, through point [x,y,z] or ref_point_id. Use its id as ref_plane_id in create_sketch, hole, mirror, draft.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["offset", "angle", "three_points", "midplane", "normal_to_curve", "parallel_at_point"] },
+        "sketch_id": { "type": "string" },
+        "at": { "type": "string", "enum": ["start", "end"] },
+        "point": { "type": "array", "items": { "type": ["number", "string"] }, "minItems": 3, "maxItems": 3 },
+        "ref_point_id": { "type": "string" },
+        "from": { "type": "object" },
+        "distance": { "type": ["number", "string"] },
+        "flip": { "type": "boolean" },
+        "axis": { "type": ["string", "object"] },
+        "angle": { "type": ["number", "string"] },
+        "points": { "type": "array", "items": { "type": "array", "items": { "type": ["number", "string"] }, "minItems": 3, "maxItems": 3 }, "minItems": 3, "maxItems": 3 },
+        "a": { "type": "object" },
+        "b": { "type": "object" },
+        "name": { "type": "string" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "reference_axis",
+    "description": "Create a reference axis: type 'two_points' (p1, p2 as [x,y,z]), 'two_planes' (a, b plane specs: their intersection), or 'entity' (of: a cylindrical face {face:{index}}, an edge {edge:{index}}, or 'X'/'Y'/'Z'). Use its id as ref_axis_id in patterns.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["two_points", "two_planes", "entity"] },
+        "p1": { "type": "array", "items": { "type": ["number", "string"] }, "minItems": 3, "maxItems": 3 },
+        "p2": { "type": "array", "items": { "type": ["number", "string"] }, "minItems": 3, "maxItems": 3 },
+        "a": { "type": "object" },
+        "b": { "type": "object" },
+        "of": { "type": ["string", "object"] },
+        "name": { "type": "string" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "reference_point",
+    "description": "Create a reference point: type 'coords' (x, y, z), 'arc_center' (edge {index} of a circular edge) or 'face_center' (face {index}).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["coords", "arc_center", "face_center"] },
+        "x": { "type": ["number", "string"] }, "y": { "type": ["number", "string"] }, "z": { "type": ["number", "string"] },
+        "edge": { "type": "object" },
+        "face": { "type": "object" },
+        "name": { "type": "string" }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    }
+  }
+]

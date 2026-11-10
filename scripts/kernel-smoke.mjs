@@ -1,0 +1,15 @@
+import init from 'replicad-opencascadejs';
+const t0 = Date.now();
+const oc = await init();
+console.log('init ms', Date.now() - t0);
+const IN = 25.4;
+const box = new oc.BRepPrimAPI_MakeBox(4 * IN, 2 * IN, 0.5 * IN).Shape();
+const ax = new oc.gp_Ax2(new oc.gp_Pnt(0.5 * IN, 1 * IN, -1), new oc.gp_Dir(0, 0, 1));
+const cyl = new oc.BRepPrimAPI_MakeCylinder(ax, 0.125 * IN, 0.5 * IN + 2).Shape();
+const cut = new oc.BRepAlgoAPI_Cut(box, cyl, new oc.Message_ProgressRange());
+const shape = cut.Shape();
+const props = new oc.GProp_GProps();
+oc.BRepGProp.VolumeProperties(shape, props, 1e-9, false, false);
+const vol = props.Mass();
+const expected = (4 * 2 * 0.5 - Math.PI * 0.125 ** 2 * 0.5) * IN ** 3;
+console.log('volume mm3', vol, 'expected', expected, 'rel err', Math.abs(vol - expected) / expected);

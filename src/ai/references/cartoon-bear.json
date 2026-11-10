@@ -1,0 +1,19 @@
+[
+{"tool": "set_part_name", "name": "Cartoon Bear Figurine"},
+{"tool": "profile_body", "name": "Body", "squareness": 2.2, "end": "flat", "stations": [{"at": 0, "x": 0.95, "y": [-0.82, 0.82]}, {"at": 0.6, "x": 1.15, "y": [-1.0, 0.95]}, {"at": 1.3, "x": 1.05, "y": [-0.9, 0.85]}, {"at": 2.0, "x": 0.8, "y": [-0.68, 0.68]}, {"at": 2.35, "x": 0.62, "y": [-0.55, 0.55]}]},
+{"tool": "profile_body", "name": "Head", "squareness": 2.2, "start": "round", "end": "round", "start_dome": 0.18, "end_dome": 0.38, "stations": [{"at": 2.15, "x": 0.7, "y": [-0.6, 0.6]}, {"at": 2.45, "x": 1.15, "y": [-0.95, 0.9]}, {"at": 2.95, "x": 1.32, "y": [-1.05, 1.0]}, {"at": 3.5, "x": 1.28, "y": [-1.02, 0.98]}, {"at": 4.05, "x": 1.08, "y": [-0.88, 0.85]}]},
+{"tool": "profile_body", "name": "Muzzle", "axis": "Y", "squareness": 2.3, "start": "round", "start_dome": 0.14, "stations": [{"at": -1.36, "x": 0.4, "z": [2.64, 3.06]}, {"at": -1.1, "x": 0.48, "z": [2.56, 3.14]}, {"at": -0.6, "x": 0.5, "z": [2.54, 3.22]}]},
+{"tool": "profile_body", "name": "Nose", "axis": "Y", "squareness": 2.2, "start": "round", "start_dome": 0.06, "stations": [{"at": -1.52, "x": 0.15, "z": [2.94, 3.1]}, {"at": -1.42, "x": 0.18, "z": [2.92, 3.13]}, {"at": -1.3, "x": 0.17, "z": [2.93, 3.12]}], "end": "round", "end_dome": 0.06},
+{"tool": "tube", "name": "Mouth Line", "operation": "cut", "path": [[-0.17, -1.471, 2.77], [0, -1.452, 2.7], [0.17, -1.471, 2.77]], "radius": 0.022, "ends": "round"},
+{"tool": "tube", "name": "Mouth Center Line", "operation": "cut", "path": [[0, -1.487, 2.9], [0, -1.489, 2.8], [0, -1.456, 2.71]], "radius": 0.02, "ends": "round"},
+{"tool": "tube", "name": "Left Eye", "path": [[-0.42, -0.84, 3.42], [-0.42, -0.97, 3.42]], "radius": 0.12, "start_end": "flat", "finish_end": "round"},
+{"tool": "mirror", "name": "Right Eye", "features": ["Left Eye"], "plane": {"plane": "YZ"}},
+{"tool": "profile_body", "name": "Left Ear", "axis": "Y", "squareness": 2, "start": "round", "end": "round", "start_dome": 0.07, "end_dome": 0.07, "stations": [{"at": -0.12, "x": [-1.15, -0.6], "z": [3.85, 4.38]}, {"at": 0, "x": [-1.2, -0.55], "z": [3.8, 4.43]}, {"at": 0.12, "x": [-1.15, -0.6], "z": [3.85, 4.38]}]},
+{"tool": "loft_sections", "name": "Left Inner Ear", "plane": "XZ", "operation": "cut", "sections": [{"offset": 0.3, "oval": {"cx": -0.875, "cy": 4.13, "rx": 0.19, "ry": 0.19}}, {"offset": 0.16, "oval": {"cx": -0.875, "cy": 4.13, "rx": 0.18, "ry": 0.18}}], "end_point": [-0.875, -0.05, 4.13]},
+{"tool": "mirror", "name": "Right Ear", "features": ["Left Ear", "Left Inner Ear"], "plane": {"plane": "YZ"}},
+{"tool": "tube", "name": "Left Arm", "path": [[-0.55, -0.1, 2.0], [-0.95, -0.42, 1.55], [-0.88, -0.78, 1.08]], "radii": [0.3, 0.27, 0.25], "start_end": "flat", "finish_end": "round"},
+{"tool": "mirror", "name": "Right Arm", "features": ["Left Arm"], "plane": {"plane": "YZ"}},
+{"tool": "tube", "name": "Left Leg", "path": [[-0.45, -0.2, 0.42], [-0.55, -0.75, 0.38], [-0.58, -1.05, 0.38]], "radii": [0.37, 0.36, 0.35], "start_end": "flat", "finish_end": "round"},
+{"tool": "loft_sections", "name": "Left Foot Pad", "plane": "XZ", "operation": "cut", "sections": [{"offset": 1.48, "oval": {"cx": -0.58, "cy": 0.4, "rx": 0.19, "ry": 0.21}}, {"offset": 1.38, "oval": {"cx": -0.58, "cy": 0.4, "rx": 0.18, "ry": 0.2}}], "end_point": [-0.58, -1.33, 0.4]},
+{"tool": "mirror", "name": "Right Leg", "features": ["Left Leg", "Left Foot Pad"], "plane": {"plane": "YZ"}}
+]

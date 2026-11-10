@@ -1,0 +1,564 @@
+[
+  {
+    "name": "get_model_state",
+    "description": "Read the current part: units, parameters (with values), orientation conventions, every feature (id, type, name, inputs, regeneration status, exact extent = size/min/max/center, parameters_used, and which features use each sketch), sketch entity ids, exact mass properties and bounding box, and what the user has selected in the viewport (with exact measurements). Call this before editing an existing part and after building to verify dimensions.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "set_units",
+    "description": "Set the document's length units. Bare numbers in every field are interpreted in these units.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "units": {
+          "type": "string",
+          "enum": [
+            "in",
+            "mm"
+          ]
+        }
+      },
+      "required": [
+        "units"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "set_part_name",
+    "description": "Name the part (shown at the top of the feature tree and used for saved and exported file names), e.g. 'Model Airplane'. Name every new part you build.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "set_material",
+    "description": "Set the part material used for mass. Use a name from the built-in list when it matches (Aluminum 6061-T6, Aluminum 7075-T6, Steel, AISI 1018, Steel, AISI 4140, Stainless Steel 304, Stainless Steel 316, Brass C360, Copper C110, Titanium Ti-6Al-4V, Cast Iron, Gray, ABS, PLA, PETG, Nylon 6/6, Acetal (POM), Polycarbonate); otherwise give name and density in g/cm^3.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "density": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "set_parameter",
+    "description": "Create or change a named parameter (design variable), e.g. name 'wall', value '0.125' or '3 mm' or '2*wall'. Parameters can be used in any value field. Prefer parameters for a part's key dimensions, named after the region they size (e.g. left_wing_span), so the user can edit them later. Returns affected_features with their new extents.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z_0-9]*$"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "create_sketch",
+    "description": "Create a 2D sketch on a base plane and add entities to it. Planes (Z is up): 'XY' = Top plane (sketch x -> world X, sketch y -> world Y, normal +Z); 'XZ' = Front plane (sketch x -> world X, sketch y -> world Z, normal -Y); 'YZ' = Right plane (sketch x -> world Y, sketch y -> world Z, normal +X). 'offset' moves the plane along its normal. Closed loops become profiles; loops inside loops become holes. Returns the sketch id and entity ids. Wherever a tool takes a feature or sketch id you may also pass its exact name.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plane": {
+          "type": "string",
+          "enum": [
+            "XY",
+            "XZ",
+            "YZ"
+          ]
+        },
+        "offset": {
+          "$ref": "#/$defs/value"
+        },
+        "ref_plane_id": {
+          "type": "string",
+          "description": "Optional: put the sketch on this reference plane (from reference_plane) instead of the base plane. Sketch x/y then follow that plane's axes."
+        },
+        "name": {
+          "type": "string"
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/entity"
+          }
+        }
+      },
+      "required": [
+        "plane",
+        "entities"
+      ],
+      "additionalProperties": false,
+      "$defs": {
+        "value": {
+          "description": "A number in document units, or an expression string with optional units and parameters, e.g. '0.25', '6 mm', 'W/2', '1/4\"'. Angles in formulas need a unit: cos(lean_angle) where lean_angle is defined as '20 deg', or cos(20 deg); never cos(20) or a parameter defined as plain 20. Do not write 'name deg' for a parameter that already has a unit. Multiplying two lengths is not supported.",
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "entity": {
+          "type": "object",
+          "description": "One of: rectangle {x,y,width,height,centered?} (x,y = lower-left corner, or center if centered); circle {cx,cy,diameter}; line {x1,y1,x2,y2}; arc {cx,cy,radius,start_angle,end_angle} (degrees, counter-clockwise from start to end); polygon {points:[[x,y],...]} (closed polyline); slot {x1,y1,x2,y2,width} (straight slot between two center points); spline {points:[[x,y],...], closed?} (smooth curve passing exactly through every point, C2-continuous; closed:true makes a smooth closed loop that is a profile on its own; an open spline joins lines/arcs/other splines at its end points). Use closed splines for organic cross-sections (heads, bodies, hulls) and open splines for smooth paths and profile edges; oval {cx,cy,rx,ry,squareness?,rotation?} (smooth closed spline: an ellipse, or with squareness 3-6 a soft rounded rectangle; rotation in degrees). Set construction:true for reference geometry such as a revolve axis.",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "rectangle",
+                "circle",
+                "line",
+                "arc",
+                "polygon",
+                "slot",
+                "spline",
+                "oval"
+              ]
+            },
+            "x": {
+              "$ref": "#/$defs/value"
+            },
+            "y": {
+              "$ref": "#/$defs/value"
+            },
+            "width": {
+              "$ref": "#/$defs/value"
+            },
+            "height": {
+              "$ref": "#/$defs/value"
+            },
+            "centered": {
+              "type": "boolean"
+            },
+            "cx": {
+              "$ref": "#/$defs/value"
+            },
+            "cy": {
+              "$ref": "#/$defs/value"
+            },
+            "diameter": {
+              "$ref": "#/$defs/value"
+            },
+            "radius": {
+              "$ref": "#/$defs/value"
+            },
+            "x1": {
+              "$ref": "#/$defs/value"
+            },
+            "y1": {
+              "$ref": "#/$defs/value"
+            },
+            "x2": {
+              "$ref": "#/$defs/value"
+            },
+            "y2": {
+              "$ref": "#/$defs/value"
+            },
+            "start_angle": {
+              "$ref": "#/$defs/value"
+            },
+            "end_angle": {
+              "$ref": "#/$defs/value"
+            },
+            "points": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/value"
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "description": "polygon: >= 3 corners. spline: the points the curve passes through, in order (>= 2 open, >= 3 closed; 6-14 points make a good organic section)."
+            },
+            "construction": {
+              "type": "boolean"
+            },
+            "closed": {
+              "type": "boolean",
+              "description": "spline only: closed smooth loop."
+            },
+            "rx": {
+              "$ref": "#/$defs/value"
+            },
+            "ry": {
+              "$ref": "#/$defs/value"
+            },
+            "squareness": {
+              "type": "number",
+              "description": "oval only: 2 = ellipse (default), 3-6 = increasingly square with soft corners."
+            },
+            "rotation": {
+              "type": "number",
+              "description": "oval only: degrees counter-clockwise."
+            }
+          },
+          "required": [
+            "type"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "name": "add_to_sketch",
+    "description": "Add more entities to an existing sketch (same entity format as create_sketch).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "sketch_id": {
+          "type": "string"
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      "required": [
+        "sketch_id",
+        "entities"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "extrude",
+    "description": "Extrude a sketch's closed profiles. operation: 'new' (first solid), 'add' (boss, joins the existing solid) or 'cut' (removes material). direction: 'normal' (along the sketch plane normal), 'reverse', or 'symmetric' (mid-plane, depth split evenly). through_all: cut/extend through the whole part (depth ignored). Optional Direction 2 (opposite side of the sketch plane, not with 'symmetric'): depth2 or through_all2. Returns the feature id and whether it regenerated successfully, plus the new exact volume. Standard end conditions for Direction 1: up_to_vertex ({ref_point_id} or {edge:{index}, near:[x,y,z]} = the end of that edge nearest 'near', document units) ends on the plane through the vertex parallel to the sketch; up_to_surface ({plane:'XY'|'XZ'|'YZ', offset}, {ref_plane_id} or {face:{index}} of a flat face) ends exactly on that plane (tilted planes too; it must not cross the profile); add surface_offset (and reverse_offset) for Offset From Surface. The direction then comes from where the target is (depth/direction reverse are ignored). start_offset (+ start_offset_reverse) = From: Offset. draft (degrees, Direction 1, not with symmetric) tapers the sides inward, draft_outward flips it. flip_side (cuts only) removes the material outside the profile. thin: Thin Feature (same as revolve's thin): a constant-thickness wall from the sketch curves, open or closed (closed loops: thickness goes inside, reverse puts it outside).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "sketch_id": {
+          "type": "string"
+        },
+        "depth": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "new",
+            "add",
+            "cut"
+          ]
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "normal",
+            "reverse",
+            "symmetric"
+          ]
+        },
+        "through_all": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "depth2": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "through_all2": {
+          "type": "boolean"
+        },
+        "up_to_vertex": {
+          "type": "object",
+          "properties": {
+            "ref_point_id": {
+              "type": "string"
+            },
+            "edge": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer"
+                }
+              }
+            },
+            "near": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          }
+        },
+        "up_to_surface": {
+          "type": "object",
+          "properties": {
+            "plane": {
+              "type": "string",
+              "enum": [
+                "XY",
+                "XZ",
+                "YZ"
+              ]
+            },
+            "offset": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "ref_plane_id": {
+              "type": "string"
+            },
+            "face": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "surface_offset": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "reverse_offset": {
+          "type": "boolean"
+        },
+        "start_offset": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "start_offset_reverse": {
+          "type": "boolean"
+        },
+        "draft": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "draft_outward": {
+          "type": "boolean"
+        },
+        "flip_side": {
+          "type": "boolean"
+        },
+        "thin": {
+          "type": "object",
+          "description": "Thin Feature. type oneDirection: thickness on one side of the sketch curves (left of an open chain's direction, inside of a closed loop; reverse picks the other side). midPlane: thickness split equally. twoDirection: thickness on one side, thickness2 on the other. Corners are sharp; arcs stay exact.",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "oneDirection",
+                "midPlane",
+                "twoDirection"
+              ]
+            },
+            "thickness": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "thickness2": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "reverse": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "thickness"
+          ]
+        }
+      },
+      "required": [
+        "sketch_id"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "revolve",
+    "description": "Revolve a sketch around a line entity of the same sketch (usually a construction line; a solid line also works, even one that is an edge of the profile). axis_line_id may be left out when the sketch has exactly one construction line. angle in degrees (default 360) is Direction 1. As in pro CAD revolve options: end 'midPlane' splits angle equally on both sides of the sketch plane; reverse turns Direction 1 the other way; angle2 adds a blind Direction 2 the other way round (not with midPlane; angle + angle2 <= 360). thin makes a constant-thickness wall from the sketch curves (an open chain such as a cup or lampshade outline, or closed loops); without thin the sketch needs a closed profile.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "sketch_id": {
+          "type": "string"
+        },
+        "axis_line_id": {
+          "type": "string"
+        },
+        "angle": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "end": {
+          "type": "string",
+          "enum": [
+            "blind",
+            "midPlane"
+          ]
+        },
+        "reverse": {
+          "type": "boolean"
+        },
+        "angle2": {
+          "type": [
+            "number",
+            "string"
+          ],
+          "description": "Direction 2 angle in degrees (the other way round the axis from the sketch plane)."
+        },
+        "thin": {
+          "type": "object",
+          "description": "Thin Feature. type oneDirection: thickness on one side of the sketch curves (left of an open chain's direction, inside of a closed loop; reverse picks the other side). midPlane: thickness split equally. twoDirection: thickness on one side, thickness2 on the other. Corners are sharp; arcs stay exact.",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "oneDirection",
+                "midPlane",
+                "twoDirection"
+              ]
+            },
+            "thickness": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "thickness2": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "reverse": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "thickness"
+          ]
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "new",
+            "add",
+            "cut"
+          ]
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sketch_id"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "update_feature",
+    "description": "Change inputs of an existing feature, e.g. {feature_id, changes:{depth:'0.75'}} for an extrude, {changes:{name:'Base'}} to rename, {changes:{suppressed:true}} to suppress. To change a sketch's geometry, pass changes.entities (full replacement list, in create_sketch format) or prefer editing the parameters it uses.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "feature_id": {
+          "type": "string"
+        },
+        "changes": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "feature_id",
+        "changes"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "delete_feature",
+    "description": "Delete a feature (id or name). Deleting a sketch also deletes the features built from it. Deleting a feature also deletes the sketches only it used (a loft's section sketches, an extrude's sketch), so their names are free again; keep_sketches true keeps them.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "feature_id": {
+          "type": "string"
+        },
+        "keep_sketches": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "feature_id"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "undo",
+    "description": "Undo the most recent change made during this request.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    }
+  }
+]

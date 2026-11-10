@@ -1,0 +1,11 @@
+# Independent print verification (verify/print/check_parts.py). Python 3.12 or newer.
+# Pinned to the versions the 2026-11-06 verification ran with.
+numpy==2.5.4
+scipy==1.18.1
+trimesh==5.2.0
+rtree==1.4.1
+shapely==2.2.0
+networkx==3.7
+manifold3d==3.5.4
+pymeshlab==2025.7.post1
+cadquery-ocp==7.8.1.1.post1

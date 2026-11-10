@@ -1,0 +1,11 @@
+# Cloudflare Pages: response headers for the published CHAD site (Vercel uses vercel.json instead).
+# Keep in step with vercel.json and CROSS_ORIGIN_ISOLATION in vite.config.ts (tests/deploy.test.ts checks).
+# Cross-origin isolation lets the browser run the OpenCascade WebAssembly with SharedArrayBuffer and threads.
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
+  X-Content-Type-Options: nosniff
+
+# Files in /assets/ have a content hash in their name, so browsers may keep them for a year.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
