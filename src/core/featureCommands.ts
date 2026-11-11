@@ -37,6 +37,12 @@ export function addFaceFillet(store: DocumentStore, o: { faces: FaceRef[]; faces
   return store.addFeature<FilletFeature>(named({ type: 'fillet', kind: 'face', edges: [], faces: needSome(o.faces, 'Face set 1'), faces2: needSome(o.faces2, 'Face set 2'), radius: o.radius }, o.name), { defaultName: 'FaceFillet' });
 }
 
+/** Full round fillet: the center face becomes a round tangent to it and to both (flat, parallel) side faces. */
+export function addFullRoundFillet(store: DocumentStore, o: { faces: FaceRef[]; faces2: FaceRef[]; faces3: FaceRef[]; name?: string }): string {
+  const one = (r: FaceRef[] | undefined, what: string) => { const x = needSome(r, what); if (x.length !== 1) throw new Error(`Full round fillet: ${what} must be exactly one face`); return x; };
+  return store.addFeature<FilletFeature>(named({ type: 'fillet', kind: 'fullRound', edges: [], faces: one(o.faces, 'Side face 1'), faces2: one(o.faces2, 'Side face 2'), faces3: one(o.faces3, 'Center face'), radius: 0 }, o.name), { defaultName: 'FullRoundFillet' });
+}
+
 export function addChamfer(store: DocumentStore, o: {
   edges?: EdgeRef[]; faces?: FaceRef[]; kind?: ChamferFeature['kind']; distance: ValueExpr; distance2?: ValueExpr; angle?: ValueExpr; flip?: boolean; name?: string;
 }): string {

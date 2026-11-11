@@ -399,4 +399,23 @@ export function formatLength(mm: number, unit: LengthUnit, decimals?: number): s
   return `${s} ${unit}`;
 }
 
+/**
+ * Format a measured quantity (volume, area, mass) so it never loses its significant digits:
+ * `decimals` fixed decimals for values of 1 and more (at most 15 significant digits, about what a
+ * double holds), and `decimals + 1` significant digits below 1, so a 0.01 mm part's volume of
+ * 1.25e-7 mm^3 reads "1.250000e-7" instead of "0.000000".
+ */
+export function formatMeasure(v: number, decimals = 6): string {
+  if (!Number.isFinite(v)) return String(v);
+  if (v === 0) return (0).toFixed(decimals);
+  const a = Math.abs(v);
+  if (a < 1) {
+    const s = v.toPrecision(decimals + 1);
+    // Rounding can carry 0.9999999 up to 1: format that as a value of 1 and more.
+    if (Math.abs(parseFloat(s)) < 1) return s;
+  }
+  const intDigits = Math.max(1, Math.floor(Math.log10(Math.max(a, 1))) + 1);
+  return v.toFixed(Math.min(decimals, Math.max(0, 15 - intDigits)));
+}
+
 export type { Q as Quantity };

@@ -107,7 +107,7 @@
   },
   {
     "name": "check_part",
-    "description": "Is the part a GOOD part to 3D print and to send to CNC/CAM? Checks the exact model: exactly one solid (no floating pieces), valid and closed, the STL mesh watertight, the STEP export reading back as the same solid, no tiny slivers or nearly-touching features, a flat base to stand on (and the centre of mass over it), and how much overhangs past 45 degrees (needs supports). build_model runs it at the end of every build. Fix every problem it lists before you finish, and tell the user about warnings that matter (supports needed, no flat base).",
+    "description": "Is the part a GOOD part to 3D print and to send to CNC/CAM? Checks the exact model: exactly one solid (no floating pieces), valid and closed, the STL mesh watertight, the STEP export reading back as the same solid, no tiny slivers or nearly-touching features, a flat base to stand on (and the centre of mass over it), how much overhangs past 45 degrees (needs supports), and the thinnest wall (thinnest_wall; a warning under 0.8 mm, too thin for FDM printing). build_model runs it at the end of every build. Fix every problem it lists before you finish, and tell the user about warnings that matter (supports needed, no flat base, walls too thin to print).",
     "inputSchema": {
       "type": "object",
       "properties": {},

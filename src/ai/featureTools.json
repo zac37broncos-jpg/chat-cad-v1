@@ -13,20 +13,21 @@
   },
   {
     "name": "fillet",
-    "description": "Round edges with an exact rolling-ball fillet. kind 'constant' (default): one radius on every edge in 'edges' and every edge of every face in 'faces'. kind 'variable': radius changes linearly along each edge from 'radius' at the end nearest 'start_point' to 'radius2'. kind 'face': blend where face set 'faces' meets face set 'faces2'. Tangent-continuous edges are included automatically. Returns ok/errors and the new exact volume.",
+    "description": "Round edges with an exact rolling-ball fillet. kind 'constant' (default): one radius on every edge in 'edges' and every edge of every face in 'faces'. kind 'variable': radius changes linearly along each edge from 'radius' at the end nearest 'start_point' to 'radius2'. kind 'face': blend where face set 'faces' meets face set 'faces2'. kind 'fullRound' (no radius): replace the center face 'faces3' by a half-round tangent to it and to the side faces 'faces' and 'faces2' (one face each; the sides must be flat and parallel, the center face flat); the radius is half the width between the sides and follows it when the width changes. Use it for rounded rib/tab/slot ends and fully rounded tops, instead of two fillets of half the width (those fail). Tangent-continuous edges are included automatically. Returns ok/errors and the new exact volume.",
     "inputSchema": {
       "type": "object",
       "properties": {
-        "kind": { "type": "string", "enum": ["constant", "variable", "face"] },
+        "kind": { "type": "string", "enum": ["constant", "variable", "face", "fullRound"] },
         "edges": { "$ref": "#/$defs/edges" },
         "faces": { "$ref": "#/$defs/faces" },
         "faces2": { "$ref": "#/$defs/faces" },
+        "faces3": { "$ref": "#/$defs/faces", "description": "Full round: the center face (one face)." },
         "radius": { "$ref": "#/$defs/value" },
         "radius2": { "$ref": "#/$defs/value" },
         "start_point": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3, "description": "Variable fillet: a point (document units) nearest the edge end that gets 'radius'." },
         "name": { "type": "string" }
       },
-      "required": ["radius"],
+      "required": [],
       "additionalProperties": false,
       "$defs": {
         "value": { "type": ["number", "string"], "description": "Number in document units or an expression, e.g. 0.125, '3 mm', 'R/2'. Angles in formulas need a unit: cos(lean_angle) where lean_angle is defined as '20 deg', or cos(20 deg); never cos(20) or a parameter defined as plain 20. Do not write 'name deg' for a parameter that already has a unit. Multiplying two lengths is not supported." },

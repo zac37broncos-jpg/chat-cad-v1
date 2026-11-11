@@ -186,6 +186,8 @@ async function run(ctx: ExecutorContext, name: string, a: Args): Promise<string>
       const tp = await t();
       const edges = edgeRefs(ctx, tp, a.edges, 'edges');
       const faces = faceRefs(ctx, tp, a.faces, 'faces');
+      if (a.kind === 'fullRound') return F.addFullRoundFillet(store, { faces, faces2: faceRefs(ctx, tp, a.faces2, 'faces2'), faces3: faceRefs(ctx, tp, a.faces3, 'faces3'), name: a.name });
+      if (a.radius === undefined || a.radius === '') throw new Error("fillet: radius is required (only kind 'fullRound' has none)");
       if (a.kind === 'variable') {
         const startAt = Array.isArray(a.start_point) ? (a.start_point.map((c: number) => c * MM_PER[store.state.units]) as Vec3) : undefined;
         return F.addVariableFillet(store, { edges, radius: a.radius, radius2: a.radius2, ...(startAt ? { startAt } : {}), name: a.name });
@@ -283,7 +285,7 @@ async function run(ctx: ExecutorContext, name: string, a: Args): Promise<string>
 
 /** Fields of modelling features that hold face / edge / plane / axis references, and the tool argument names that also set them. */
 const PICK_FIELDS: Partial<Record<Feature['type'], { edges?: string[]; faces?: string[]; planes?: string[]; axes?: string[]; alias?: Record<string, string> }>> = {
-  fillet: { edges: ['edges'], faces: ['faces', 'faces2'], alias: { start_point: 'startAt' } },
+  fillet: { edges: ['edges'], faces: ['faces', 'faces2', 'faces3'], alias: { start_point: 'startAt' } },
   chamfer: { edges: ['edges'], faces: ['faces'] },
   shell: { faces: ['faces'], alias: { open_faces: 'faces' } },
   draft: { faces: ['faces'], planes: ['neutral'], alias: { neutral_plane: 'neutral' } },

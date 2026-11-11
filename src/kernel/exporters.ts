@@ -27,7 +27,7 @@ import { countSolids, isValid, freeEdgeCount, shapeDistance } from './regen';
 import { selfIntersections } from './meshIntersect';
 import { listSubShapes } from './query';
 import { free, freeAll, takeXyz } from './mem';
-import { safeFileBase } from './exportDefaults';
+import { safeFileBase, STL_PRESETS } from './exportDefaults';
 
 export { safeFileBase };
 import { exactBox } from './bbox';
@@ -958,6 +958,52 @@ export function checkMesh(pos: ArrayLike<number>, tri: ArrayLike<number>): MeshC
   return { vertices: V, openEdges: open, nonManifoldEdges: nonMan, flippedEdges: flipped, zeroAreaTriangles: zeroArea, pieces, throughHoles, volume: vol, min, max };
 }
 
+/**
+ * The share of the STL setting that must be left for the curved surfaces once float32 rounding and
+ * welding are taken off (see exportStlFile). With a quarter left, curved faces need at most about 4
+ * times the triangles they need near the origin.
+ */
+export const STL_MIN_SHARE = 0.25;
+
+/** How far from the origin (mm) a curved part can reach and still be exported at this STL setting (mm). */
+export function stlFarLimitMm(lin: number): number {
+  return Math.max(0, ((1 - STL_MIN_SHARE) * lin / Math.sqrt(3) - WELD_MM) * 2 ** 24);
+}
+
+function farFromOriginMessage(lin: number, maxCoordMm: number): string {
+  const m = (mm: number) => (mm >= 1000 ? `${+(mm / 1000).toFixed(1)} m` : `${+mm.toFixed(0)} mm`);
+  const coarser = STL_PRESETS.filter((p) => p.linearDeflection > lin && stlFarLimitMm(p.linearDeflection) >= maxCoordMm).map((p) => p.label.replace(/ \(.*\)$/, ''));
+  return `This part reaches ${m(maxCoordMm)} from the origin. That far out, the STL file's 32-bit numbers alone move points by up to ` +
+    `${(Math.sqrt(3) * maxCoordMm * 2 ** -24).toFixed(4)} mm, which leaves too little of the ${lin} mm resolution for the curved surfaces ` +
+    `(${lin} mm works up to ${m(stlFarLimitMm(lin))} from the origin). ` +
+    `${coarser.length ? `Choose a coarser resolution (${coarser.join(' or ')} works here)` : 'Choose a coarser resolution'}, or move the part closer to the origin. ` +
+    'The STEP file is not affected: it keeps the exact geometry at any distance.';
+}
+
+/** True when any face is not flat or any edge is not straight (those need a chord tolerance). */
+function hasCurves(oc: OC, s: TopoDS_Shape): boolean {
+  const faces = listSubShapes(oc, s, 'TopAbs_FACE');
+  const edges = listSubShapes(oc, s, 'TopAbs_EDGE');
+  try {
+    for (const f of faces) {
+      const face = oc.TopoDS.Face(f);
+      const ad = new oc.BRepAdaptor_Surface(face, true);
+      const t = ad.GetType();
+      free(ad, face);
+      if (!(t === (oc as any).GeomAbs_SurfaceType?.GeomAbs_Plane || String(t).includes('Plane'))) return true;
+    }
+    for (const e0 of edges) {
+      const e = oc.TopoDS.Edge(e0);
+      if (oc.BRep_Tool.Degenerated(e)) { free(e); continue; }
+      const ad = new oc.BRepAdaptor_Curve(e);
+      const t = ad.GetType();
+      free(ad, e);
+      if (!(t === (oc as any).GeomAbs_CurveType?.GeomAbs_Line || String(t).includes('Line'))) return true;
+    }
+    return false;
+  } finally { freeAll(faces); freeAll(edges); }
+}
+
 const STL_HEADER_PREFIX = `${APP_NAME} binary STL`;
 
 /** Plain printable ASCII (for the STL header and the ASCII solid name). */
@@ -985,6 +1031,11 @@ export function exportStlFile(oc: OC, s: TopoDS_Shape, opt: StlOptions): { data:
   bb.delete();
   const maxCoordMm = Math.max(...bl.map(Math.abs), ...bh.map(Math.abs));
   const linEff = lin - Math.sqrt(3) * (maxCoordMm * 2 ** -24 + WELD_MM);
+  // Far from the origin that margin eats the whole setting: the mesher would then refine curved
+  // faces without end (a 20 mm cylinder 100 m out ran for minutes and the stress test's 100 m
+  // part ran out of memory). Flat faces and straight edges are meshed exactly whatever the margin,
+  // and their real movement is measured and reported below, so only curved parts are refused.
+  if (linEff < STL_MIN_SHARE * lin && hasCurves(oc, s)) throw new Error(farFromOriginMessage(lin, maxCoordMm));
   const meshTo = (target: number, ang: number) => {
     let raw = triangulate(oc, s, target, ang, linEff);
     passes++;
