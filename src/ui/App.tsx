@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { DocumentStore } from '../core/store';
 import type { BasePlane, CadDocument, Feature, SketchFeature } from '../core/model';
 import { KernelClient, Superseded } from '../kernel/client';
@@ -670,6 +671,7 @@ export function App() {
       {popup?.kind === 'sbar' && <ShortcutBar x={popup.x} y={popup.y} ctx={ctx} tools={sketcher.controller ? sketchShortcutTools(sketcher.controller, sketcher) : undefined} onClose={() => setPopup(null)} onRun={runCommand} />}
       {popup?.kind === 'search' && <CommandSearch ctx={ctx} onClose={() => setPopup(null)} onRun={runCommand} />}
       {drawingOpen && <div style={{ position: 'fixed', inset: 0, zIndex: 60 }}><DrawingWorkspace store={store} kernel={kernel} onClose={() => setDrawingOpen(false)} /></div>}
+      <Analytics />
     </div>
   );
 }
