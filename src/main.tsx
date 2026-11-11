@@ -1,4 +1,5 @@
 import { createRoot } from 'react-dom/client';
+import { Analytics } from '@vercel/analytics/react';
 import { prepareAutosave } from './ui/autosave';
 import './ui/styles.css';
 
@@ -6,4 +7,4 @@ import './ui/styles.css';
 // so it is read before the app module (which creates the document store) is loaded.
 void prepareAutosave()
   .then(() => import('./ui/App'))
-  .then(({ App }) => createRoot(document.getElementById('root')!).render(<App />));
+  .then(({ App }) => createRoot(document.getElementById('root')!).render(<><App /><Analytics /></>));
