@@ -658,7 +658,7 @@ export function App() {
           <span>{busy ? 'Rebuilding…' : regen ? `Rebuilt in ${regen.ms.toFixed(0)} ms` : ''}</span>
           <span>{activeSketch ? `Editing ${store.feature(activeSketch)?.name ?? 'Sketch'}` : 'Editing Part'}</span>
           <span>Mouse: {NAV_PRESETS[view.nav].label}</span>
-          <select className="units" title="Unit system" value={u} onChange={(e) => store.setUnits(e.target.value as 'in' | 'mm')}>
+          <select className="units" title="Unit system" value={u} onChange={(e) => { try { store.setUnits(e.target.value as 'in' | 'mm'); } catch (err) { setNotice(err instanceof Error ? err.message : String(err)); } }}>
             <option value="in">IPS (inch, pound, second)</option>
             <option value="mm">MMGS (mm, gram, second)</option>
           </select>

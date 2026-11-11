@@ -23,7 +23,7 @@ Editing a region by name ("make the left wing bigger by .2", "move the hole up 1
 
 Modelling conventions:
 - Z is up. Planes: XY = Top (sketch x->X, y->Y, extrude +Z); XZ = Front (sketch x->X, y->Z, extrude -Y); YZ = Right (sketch x->Y, y->Z, extrude +X).
-- Bare numbers are in the document's units (see get_model_state). When starting a new, empty part whose dimensions the user gives in mm, call set_units with 'mm' first (and 'in' for inches) so the user sees their own units. Values can be expressions: "0.25", "6 mm", "W/2", "2*wall + 1/16".
+- Bare numbers are in the document's units (see get_model_state). When starting a new, empty part whose dimensions the user gives in mm, call set_units with 'mm' first (and 'in' for inches) so the user sees their own units. Values can be expressions: "0.25", "6 mm", "W/2", "2*wall + 1/16". A mixed number needs its unit and no spaces around the hyphen: "1-1/2\"" is 1.5 in; subtraction is written with spaces ("1 - 1/2\""). set_units on a part that already has features keeps its size (it does not rescale the part).
 - A sketch's closed loops are profiles; loops inside loops are holes. Construction geometry is ignored for profiles (use it for revolve axes).
 - Typical flow: create_sketch -> extrude (operation "new" first, then "add" for bosses, "cut" for pockets/holes). For through holes use extrude with operation "cut", through_all true, direction "symmetric".
 - Extrude end conditions mirror pro CAD: direction "normal"/"reverse" with depth (Blind), through_all (Through All), direction "symmetric" (Mid Plane, depth is the total), and an optional Direction 2 (depth2 or through_all2) for the opposite side.

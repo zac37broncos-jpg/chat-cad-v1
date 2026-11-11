@@ -10,6 +10,7 @@ import {
 import { type ModelingFeature, DEFAULT_NAMES } from './featureTypes';
 import { evaluate, type Quantity, ExpressionError } from './units';
 import { nextLoftSeam } from './loftSeam';
+import { convertDocumentUnits } from './unitSwitch';
 
 type Listener = (doc: CadDocument) => void;
 
@@ -251,8 +252,17 @@ export class DocumentStore {
     this.mutate(`Rename part to ${n}`, (d) => { d.name = n; });
   }
 
+  /**
+   * Change the document's units. The part keeps its size: every length that
+   * was a plain number in the old unit gets that unit written out first
+   * ("3.1417" -> "3.1417 in"), as in professional CAD, where the unit system changes
+   * how sizes are shown and typed, never the part (src/core/unitSwitch.ts).
+   * Throws, changing nothing, if a value cannot be read.
+   */
   setUnits(units: CadDocument['units']) {
-    this.mutate(`Units: ${units}`, (d) => { d.units = units; });
+    if (units !== 'in' && units !== 'mm') throw new Error(`Unknown units "${String(units)}" (use "in" or "mm")`);
+    const next = convertDocumentUnits(this.doc, units);
+    this.mutate(`Units: ${units}`, (d) => { d.units = next.units; d.params = next.params; d.features = next.features; });
   }
 
   setParameter(name: string, expr: string) {

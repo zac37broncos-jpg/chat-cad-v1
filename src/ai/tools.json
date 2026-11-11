@@ -10,7 +10,7 @@
   },
   {
     "name": "set_units",
-    "description": "Set the document's length units. Bare numbers in every field are interpreted in these units.",
+    "description": "Set the document's length units (how sizes are shown, and what new bare numbers mean). The part keeps its size: values already in the part that were bare numbers get their old unit written out (\"3.1417\" becomes \"3.1417 in\"), as in professional CAD. Bare numbers you send after this call are in the new units.",
     "inputSchema": {
       "type": "object",
       "properties": {

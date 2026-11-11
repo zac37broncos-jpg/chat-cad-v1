@@ -189,7 +189,8 @@ export function toStoredEntities(ents: WEntity[], units: LengthUnit): SketchEnti
 
 /** True when any stored coordinate is an expression rather than a plain number. */
 export function hasExpressionCoordinates(sk: SketchFeature): boolean {
-  const isExpr = (v: ValueExpr) => typeof v === 'string' && !/^\s*[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?\s*$/.test(v);
+  // A plain number, or a plain number with its unit ("3.1417 in", written by a unit change), is not an expression.
+  const isExpr = (v: ValueExpr) => typeof v === 'string' && !/^\s*[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?\s*(in|mm)?\s*$/.test(v);
   return sk.entities.some((e) => {
     switch (e.kind) {
       case 'point': return isExpr(e.p.x) || isExpr(e.p.y);

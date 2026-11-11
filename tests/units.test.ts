@@ -87,3 +87,49 @@ describe('angles in formulas', () => {
     expect(() => evalLength('2 mm * 3 mm', 'mm')).toThrow(/area/);
   });
 });
+
+describe('mixed numbers such as 1-1/2"', () => {
+  // A mixed number gives bit for bit the same length as its decimal.
+  const same = (mixed: string, decimal: string, unit: 'in' | 'mm' = 'mm', params = {}) =>
+    expect(evalLength(mixed, unit, params), mixed).toBe(evalLength(decimal, unit, params));
+  it('reads a whole number, hyphen or space, and a fraction before a unit as one quantity', () => {
+    same('1-1/2"', '1.5"', 'in');
+    same('1-1/2"', '1.5"'); // in a mm part this was 1 mm - 12.7 mm = -11.7 mm
+    expect(evalLength('1-1/2"', 'mm')).toBeCloseTo(38.1, 12);
+    same('1-1/2 in', '1.5 in', 'in');
+    same('1 1/2"', '1.5"');
+    same('2-3/8 in', '2.375 in');
+    same('3-1/2 mm', '3.5 mm', 'in');
+    same("1-1/2'", "1.5'");
+    same('-1-1/2"', '-1.5"');
+    expect(evalLength('1-1/3"', 'mm')).toBe((4 / 3) * 25.4); // one correctly rounded division
+    expect(evalAngle('22-1/2 deg')).toBe(evalAngle('22.5 deg'));
+  });
+  it('works inside expressions', () => {
+    const W = { W: { v: 50.8, dim: 'length' as const } };
+    same('W + 1-1/2"', 'W + 1.5"', 'mm', W);
+    same('W - 1-1/2"', 'W - 1.5"', 'mm', W);
+    same('(1-1/2")/2', '(1.5")/2');
+    same('2*(1-1/2")', '2*(1.5")');
+  });
+  it('subtraction is written with spaces, and keeps working', () => {
+    same('1 - 1/2"', '1 - 0.5"', 'in');
+    expect(evalLength('1 - 1/2"', 'in')).toBeCloseTo(12.7, 12);
+    expect(evalLength('2 - 1/2"', 'mm')).toBeCloseTo(2 - 12.7, 12); // bare 2 takes the document unit, as before
+    expect(evalLength('3 in - 1/2"', 'mm')).toBeCloseTo(63.5, 12);
+    expect(evalLength('W-1/2"', 'mm', { W: { v: 50.8, dim: 'length' } })).toBeCloseTo(38.1, 12);
+    expect(evalLength('1.5-1/2"', 'in')).toBeCloseTo(25.4, 12); // a decimal is never the whole part of a mixed number
+    expect(evalLength('10-1/2*2', 'mm')).toBe(9); // no unit, and the fraction is multiplied: plain arithmetic
+  });
+  it('refuses the forms that could mean either, with a message, instead of guessing', () => {
+    expect(() => evalLength('1-1/2', 'in')).toThrow(/ambiguous.*1-1\/2".*1 - 1\/2/);
+    expect(() => evalLength('(1-1/2)', 'in')).toThrow(/ambiguous/);
+    expect(() => evalLength('W + 1-1/2', 'in', { W: { v: 1, dim: 'length' } })).toThrow(/ambiguous/);
+    expect(() => evalLength('2*1-1/2"', 'in')).toThrow(/ambiguous.*\*\(1-1\/2"\)/);
+    expect(() => evalLength('W/2-1/4"', 'in', { W: { v: 1, dim: 'length' } })).toThrow(/ambiguous/);
+    expect(() => evalLength('1-3/2"', 'in')).toThrow(/not a mixed number/);
+    expect(() => evalLength('1 3/2"', 'in')).toThrow(/not a mixed number/);
+    expect(() => evalLength('1-0/2"', 'in')).toThrow(/not a mixed number/);
+    expect(() => evalLength('1-1/0"', 'in')).toThrow(ExpressionError);
+  });
+});

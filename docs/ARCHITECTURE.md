@@ -36,6 +36,7 @@ The precision rules are the foundation of the app:
 
 - All internal geometry is in millimetres, in IEEE-754 doubles. Inches exist only for input and display (1 in = 25.4 mm exactly).
 - What the user types is stored as the original expression string ("0.25 in", "W/2"), never as a rounded number, so saving and reopening cannot drift a value (`src/core/units.ts`).
+- Changing the document units keeps the part's size: plain numbers already in the part get their old unit written out first ("3.1417" becomes "3.1417 in"), and mixed numbers such as `1-1/2"` are one and a half inches. See [UNITS_AND_FRACTIONS.md](UNITS_AND_FRACTIONS.md).
 - Geometry is exact B-rep from OpenCascade. The triangle mesh is for display only: measurements, mass properties and STEP export use the exact solid.
 - Every sketch solve by planegcs is checked against CHAD's own constraint equations (`src/sketch/equations.ts`); a sketch that does not satisfy its constraints is flagged, never silently approximated.
 - STL export measures the real distance between its triangles and the true surface and meshes finer where needed (`src/kernel/exporters.ts`). The accuracy promise is 0.005 in (0.127 mm); the default export is 1/12 of that.
