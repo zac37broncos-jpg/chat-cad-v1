@@ -10,7 +10,7 @@ import type { DocumentStore } from '../core/store';
 import type { SketchEntity, ValueExpr, Feature, RevolveFeature, ExtrudeFeature, PlaneSpec } from '../core/model';
 import { faceRefFrom, edgeRefFrom } from '../kernel/naming';
 import { newId, rectangleEntities, centerRectangleEntities, MATERIALS, featureDependencies } from '../core/model';
-import { formatLength, MM_PER, evalLength } from '../core/units';
+import { formatLength, formatMeasure, MM_PER, evalLength } from '../core/units';
 import { resolveParams } from '../core/store';
 import type { FeatureStatus } from '../kernel/regen';
 import type { RegenResponse, SubRef, SelRef } from '../kernel/protocol';
@@ -251,9 +251,9 @@ function massSummary(r: RegenResponse, units: 'in' | 'mm', density?: number) {
   const m = r.mass, k = MM_PER[units];
   const grams = density ? (m.volume / 1000) * density : null;
   return {
-    ...(grams !== null ? { mass: units === 'in' ? `${(grams / 453.59237).toFixed(6)} lb` : `${grams.toFixed(4)} g` } : {}),
-    volume: `${(m.volume / k ** 3).toFixed(6)} ${units}^3`,
-    surface_area: `${(m.area / k ** 2).toFixed(6)} ${units}^2`,
+    ...(grams !== null ? { mass: units === 'in' ? `${formatMeasure(grams / 453.59237, 6)} lb` : `${formatMeasure(grams, 4)} g` } : {}),
+    volume: `${formatMeasure(m.volume / k ** 3)} ${units}^3`,
+    surface_area: `${formatMeasure(m.area / k ** 2)} ${units}^2`,
     bounding_box: {
       x: formatLength(m.bboxMax[0] - m.bboxMin[0], units, 6), y: formatLength(m.bboxMax[1] - m.bboxMin[1], units, 6), z: formatLength(m.bboxMax[2] - m.bboxMin[2], units, 6),
       min: m.bboxMin.map((v) => +(v / k).toFixed(6)), max: m.bboxMax.map((v) => +(v / k).toFixed(6)),
@@ -274,6 +274,7 @@ function qualitySummary(q: PartQuality, units: 'in' | 'mm') {
     step_for_cam: q.stepRoundTrip,
     flat_base: q.base ? { size: q.base.size.map((v) => +(v / k).toFixed(4)), area: `${(q.base.area / k ** 2).toFixed(4)} ${units}^2`, centre_of_mass_over_base: q.base.comInside } : null,
     overhang_percent: q.surfaceArea > 0 ? Math.round((100 * q.overhangArea) / q.surfaceArea) : 0,
+    thinnest_wall: q.walls ? formatLength(q.walls.thinnest, units, q.walls.thinnest < 0.01 ? 8 : 4) : null,
     ...(q.problems.length ? { problems: q.problems } : {}),
     ...(q.warnings.length ? { warnings: q.warnings } : {}),
   };
@@ -495,7 +496,7 @@ function convertInfo(i: Args, units: 'in' | 'mm') {
   for (const [key, v] of Object.entries(i)) {
     if (key === 'kind' || key === 'index') continue;
     if (['length', 'radius'].includes(key) && typeof v === 'number') out[key] = L(v);
-    else if (key === 'area' && typeof v === 'number') out[key] = `${(v / k ** 2).toFixed(6)} ${units}^2`;
+    else if (key === 'area' && typeof v === 'number') out[key] = `${formatMeasure(v / k ** 2)} ${units}^2`;
     else if (['start', 'end', 'center', 'origin', 'axisOrigin'].includes(key) && Array.isArray(v)) out[key] = v.map((c: number) => +(c / k).toFixed(6));
     else out[key] = v;
   }

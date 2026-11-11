@@ -60,11 +60,18 @@ export interface FilletFeature {
    *   `radius2` at its end; the start is the end nearest `startAt`.
    * face: blends between face set A (`faces`) and face set B (`faces2`)
    *   along every edge where they meet.
+   * fullRound: replaces the center face (`faces3`) by a round tangent to it
+   *   and to the two side faces (`faces`, `faces2`), like a pro CAD full
+   *   round fillet. The side faces must be flat and parallel and the center
+   *   face flat; the radius is half the distance between the sides (`radius`
+   *   is not used).
    */
-  kind: 'constant' | 'variable' | 'face';
+  kind: 'constant' | 'variable' | 'face' | 'fullRound';
   edges: EdgeRef[];
   faces?: FaceRef[];
   faces2?: FaceRef[];
+  /** Full round: the center face set (one face). */
+  faces3?: FaceRef[];
   radius: ValueExpr;
   radius2?: ValueExpr;
   startAt?: Vec3;

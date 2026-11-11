@@ -12,7 +12,7 @@ import type { SelRef } from '../kernel/protocol';
 import type { Topology } from '../kernel/naming';
 import { edgeIndex, edgeLabel, edgesFrom, faceIndex, facesFrom, planeLabel, selectionOf, selectionOfPlane } from './picks';
 import { MATERIALS } from '../core/model';
-import { evalAngle, evalLength, formatLength, MM_PER } from '../core/units';
+import { evalAngle, evalLength, formatLength, formatMeasure, MM_PER } from '../core/units';
 import type { RegenResponse } from '../kernel/protocol';
 import type { EntityInfo, MassProps } from '../kernel/query';
 import type { MassPanelState } from './massStatus';
@@ -736,9 +736,9 @@ export function massText(mass: MassProps | null | undefined, doc: Readonly<CadDo
   const volCm3 = m.volume / 1000;
   const grams = doc.material ? volCm3 * doc.material.density : null;
   return {
-    volume: `${(m.volume / k ** 3).toFixed(6)} ${u}³`,
-    area: `${(m.area / k ** 2).toFixed(6)} ${u}²`,
-    mass: grams === null ? null : u === 'in' ? `${(grams / 453.59237).toFixed(6)} lb` : `${grams.toFixed(4)} g`,
+    volume: `${formatMeasure(m.volume / k ** 3)} ${u}³`,
+    area: `${formatMeasure(m.area / k ** 2)} ${u}²`,
+    mass: grams === null ? null : u === 'in' ? `${formatMeasure(grams / 453.59237, 6)} lb` : `${formatMeasure(grams, 4)} g`,
     com: `(${m.centroid.map((c) => fix(c / k)).join(', ')}) ${u}`,
     bbox: `${formatLength(m.bboxMax[0] - m.bboxMin[0], u)} × ${formatLength(m.bboxMax[1] - m.bboxMin[1], u)} × ${formatLength(m.bboxMax[2] - m.bboxMin[2], u)}`,
   };
@@ -779,7 +779,7 @@ export function fix(v: number, d = 4): string { const s = v.toFixed(d); return /
 
 export function InfoView({ info, units }: { info: EntityInfo; units: 'in' | 'mm' }) {
   const L = (mm: number) => formatLength(mm, units);
-  const a2 = (mm2: number) => `${(mm2 / MM_PER[units] ** 2).toFixed(6)} ${units}²`;
+  const a2 = (mm2: number) => `${formatMeasure(mm2 / MM_PER[units] ** 2)} ${units}²`;
   const v3 = (p: [number, number, number]) => `(${p.map((c) => fix(c / MM_PER[units])).join(', ')})`;
   const i = info as any;
   if (info.kind === 'face') {

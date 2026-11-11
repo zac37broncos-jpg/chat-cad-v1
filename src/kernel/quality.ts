@@ -14,7 +14,9 @@
  *  - very short edges / sliver faces (CAM toolpaths and meshing trip on them);
  *  - loose geometric tolerances (sloppy joins);
  *  - no flat face to stand on the print bed, or the centre of mass is outside it;
- *  - large overhangs (needs supports).
+ *  - large overhangs (needs supports);
+ *  - walls too thin to print (under 0.8 mm, two widths of a 0.4 mm FDM nozzle; under 0.4 mm a slicer
+ *    prints nothing there).
  * All lengths are mm, areas mm^2 (the executor converts to document units).
  */
 import type { TopoDS_Shape } from 'replicad-opencascadejs';
@@ -23,6 +25,7 @@ import { countSolids, countShells, isValid, exactVolume } from './regen';
 import { listSubShapes, tessellate } from './query';
 import { exportStepFile, readStep } from './exporters';
 import { takeXyz } from './mem';
+import { wallThickness } from './walls';
 
 export interface PartQuality {
   solids: number;
@@ -42,12 +45,21 @@ export interface PartQuality {
   /** Downward-facing area steeper than 45 degrees from vertical, above the base (needs supports when printed standing). */
   overhangArea: number;
   surfaceArea: number;
+  /**
+   * Thinnest wall in mm (1st percentile over the surface, see ./walls.ts) and the share of the
+   * surface on walls under WALL_NOZZLE / WALL_FDM; null when it could not be measured.
+   */
+  walls: { thinnest: number; min: number; underNozzle: number; underFdm: number; fromSize?: boolean } | null;
   problems: string[];
   warnings: string[];
 }
 
 const SHORT_EDGE = 0.01; // mm
 const SLIVER_AREA = 0.001; // mm^2
+/** FDM limits (as in verify/print/check_parts.py): a 0.4 mm nozzle, and two of its widths for a wall. */
+const WALL_NOZZLE = 0.4, WALL_FDM = 0.8; // mm
+/** The wall check needs a mesh this close to the part (mm); a coarser quick mesh is redone this fine when a wall is near the limit. */
+const WALL_MESH = 0.02;
 
 const isReversed = (oc: OC, f: TopoDS_Shape) => String(f.Orientation()).includes('REVERSED') || f.Orientation() === (oc.TopAbs_Orientation as any).TopAbs_REVERSED;
 
@@ -145,7 +157,8 @@ export function partQuality(oc: OC, shape: TopoDS_Shape): PartQuality {
   } else warnings.push('There is no flat face on the bottom to stand on the print bed: it needs supports or a raft (add a flat base or a flat cut on the bottom if it should stand).');
 
   // A quick print mesh: watertight, and overhangs. (The STL export checks its own, finer mesh the same way.)
-  const mesh = tessellate(oc, shape, { linearDeflection: Math.max(0.01, span / 2000), angularDeflection: 0.2 });
+  const quickDeflection = Math.max(0.01, span / 2000);
+  const mesh = tessellate(oc, shape, { linearDeflection: quickDeflection, angularDeflection: 0.2 });
   // Weld vertices closer than WELD mm (faces mesh their shared edges at the same points, to float precision).
   const WELD = 1e-4, CELL = 1e-3;
   const grid = new Map<string, number[]>();
@@ -166,6 +179,7 @@ export function partQuality(oc: OC, shape: TopoDS_Shape): PartQuality {
   };
   const edgeUse = new Map<string, number>();
   let triangles = 0, overhangArea = 0;
+  const tris: number[] = [];
   const zCut = zMin + 1e-3 * span;
   for (const f of mesh.faces) {
     const P = f.positions;
@@ -174,6 +188,7 @@ export function partQuality(oc: OC, shape: TopoDS_Shape): PartQuality {
       const va = weld(P, a), vb = weld(P, b), vc = weld(P, c);
       if (va === vb || vb === vc || va === vc) continue; // zero-area (pole) triangles are dropped by the export too
       triangles++;
+      tris.push(va, vb, vc);
       for (const [p, q] of [[va, vb], [vb, vc], [vc, va]]) { const k = p < q ? `${p}_${q}` : `${q}_${p}`; edgeUse.set(k, (edgeUse.get(k) ?? 0) + 1); }
       const ux = P[b] - P[a], uy = P[b + 1] - P[a + 1], uz = P[b + 2] - P[a + 2];
       const vx = P[c] - P[a], vy = P[c + 1] - P[a + 1], vz = P[c + 2] - P[a + 2];
@@ -188,6 +203,38 @@ export function partQuality(oc: OC, shape: TopoDS_Shape): PartQuality {
   for (const n of edgeUse.values()) if (n !== 2) meshOpenEdges++;
   if (meshOpenEdges) problems.push(`The STL mesh is not watertight (${meshOpenEdges} open or non-manifold triangle edges): slicers would have to repair it.`);
   if (overhangArea > 0.05 * surfaceArea) warnings.push(`About ${Math.round((100 * overhangArea) / surfaceArea)}% of the surface overhangs more than 45 degrees: printed standing on its base it needs supports there (that is normal for figurines; say so).`);
+  // Walls too thin to print. The quick mesh is within quickDeflection of the part, so a reading can be
+  // off by twice that; when that could decide the warning, measure again on a mesh WALL_MESH close.
+  let walls: PartQuality['walls'] = null;
+  if (solids >= 1 && !meshOpenEdges) {
+    const measure = (pos: ArrayLike<number>, tri: ArrayLike<number>) => {
+      const w = wallThickness(pos, tri, [WALL_NOZZLE, WALL_FDM]);
+      return w && { thinnest: w.p1, min: w.min, underNozzle: w.below[0], underFdm: w.below[1] };
+    };
+    walls = measure(pts, tris);
+    if (walls && quickDeflection > WALL_MESH && walls.thinnest < WALL_FDM + 2 * quickDeflection) {
+      const fine = tessellate(oc, shape, { linearDeflection: WALL_MESH, angularDeflection: 0.2 });
+      const fp: number[] = [], ft: number[] = [];
+      for (const f of fine.faces) {
+        const base = fp.length / 3;
+        for (let i = 0; i < f.positions.length; i++) fp.push(f.positions[i]);
+        for (let i = 0; i < f.indices.length; i++) ft.push(base + f.indices[i]);
+      }
+      walls = measure(fp, ft) ?? walls;
+    }
+  }
+  // No mesh reading (a part far smaller than the quick mesh's tolerance gets no triangles): no wall
+  // can be thicker than the part's smallest size, so that is used.
+  const smallest = Math.min(bHi[0] - bLo[0], bHi[1] - bLo[1], bHi[2] - bLo[2]);
+  if (!walls && solids >= 1 && smallest < WALL_FDM) walls = { thinnest: smallest, min: smallest, underNozzle: smallest < WALL_NOZZLE ? 1 : 0, underFdm: 1, fromSize: true };
+  if (walls && walls.thinnest < WALL_FDM) {
+    const mm = (v: number) => `${v < 0.01 ? v.toPrecision(2) : v.toFixed(3)} mm`;
+    const pc = Math.max(1, Math.round(100 * (walls.thinnest < WALL_NOZZLE ? walls.underNozzle : walls.underFdm)));
+    const share = walls.fromSize ? ' (the whole part is that thin)' : ` (about ${pc}% of the surface is on walls under ${walls.thinnest < WALL_NOZZLE ? WALL_NOZZLE : WALL_FDM} mm)`;
+    warnings.push(walls.thinnest < WALL_NOZZLE
+      ? `Walls too thin to print: ${mm(walls.thinnest)} thin${share}. That is thinner than a 0.4 mm FDM nozzle, so a slicer prints nothing or leaves gaps there. For FDM printing make walls at least ${WALL_FDM} mm (0.031 in).`
+      : `Thin walls: down to ${mm(walls.thinnest)}${share}. FDM printers need about ${WALL_FDM} mm (0.031 in, two widths of a 0.4 mm nozzle) for a solid wall; thinner walls print weak or with gaps.`);
+  }
 
   // STEP round trip: what CAM software will read. The same read-back check as Export STEP (faces,
   // edges, validity, size, faces inside their surfaces), then the volume.
@@ -206,5 +253,5 @@ export function partQuality(oc: OC, shape: TopoDS_Shape): PartQuality {
 
   // Free the sub-shape handles (they would keep the whole part alive in the WASM heap).
   for (const x of [...faces, ...edges]) x.delete();
-  return { solids, valid, freeEdges, meshOpenEdges, triangles, stepRoundTrip, shortEdges, sliverFaces, maxTolerance: maxTol, base, overhangArea, surfaceArea, problems, warnings };
+  return { solids, valid, freeEdges, meshOpenEdges, triangles, stepRoundTrip, shortEdges, sliverFaces, maxTolerance: maxTol, base, overhangArea, surfaceArea, walls, problems, warnings };
 }

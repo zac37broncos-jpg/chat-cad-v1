@@ -263,26 +263,36 @@ function FilletPM(p: P) {
   const [edges, setEdges] = useState<EdgeRef[]>(ex?.edges ?? edgesFrom(topo, initSel.current ?? []));
   const [faces, setFaces] = useState<FaceRef[]>(ex?.faces ?? (kind === 'constant' ? facesFrom(topo, initSel.current ?? []) : []));
   const [faces2, setFaces2] = useState<FaceRef[]>(ex?.faces2 ?? []);
+  const [faces3, setFaces3] = useState<FaceRef[]>(ex?.faces3 ?? []);
   const [r1, setR1] = useState(str(ex?.radius, def(store, '0.0625', '1.5')));
   const [r2, setR2] = useState(str(ex?.radius2, def(store, '0.125', '3')));
-  const [active, setActive] = useState<'items' | 'set2'>('items');
+  const [active, setActive] = useState<'items' | 'set2' | 'set3'>('items');
+  const round = kind === 'fullRound';
 
-  const complete = kind === 'face' ? faces.length > 0 && faces2.length > 0 : kind === 'variable' ? edges.length > 0 : edges.length + faces.length > 0;
-  const valid = complete && lengthOk(store, r1) && (kind !== 'variable' || lengthOk(store, r2));
-  const defaultName = ex?.name ?? store.nextName(kind === 'variable' ? 'VarFillet' : kind === 'face' ? 'FaceFillet' : 'Fillet');
+  const complete = round ? faces.length === 1 && faces2.length === 1 && faces3.length === 1 : kind === 'face' ? faces.length > 0 && faces2.length > 0 : kind === 'variable' ? edges.length > 0 : edges.length + faces.length > 0;
+  const valid = complete && (round || lengthOk(store, r1)) && (kind !== 'variable' || lengthOk(store, r2));
+  const defaultName = ex?.name ?? store.nextName(kind === 'variable' ? 'VarFillet' : kind === 'face' ? 'FaceFillet' : round ? 'FullRoundFillet' : 'Fillet');
 
   const full = (): Omit<FilletFeature, 'id'> => ({
     type: 'fillet', name: name.trim() || defaultName, kind,
-    edges: kind === 'face' ? [] : edges,
+    edges: kind === 'face' || round ? [] : edges,
     ...(kind === 'constant' && faces.length ? { faces } : {}),
     ...(kind === 'face' ? { faces, faces2 } : {}),
-    radius: r1, ...(kind === 'variable' ? { radius2: r2 } : {}),
+    ...(round ? { faces, faces2, faces3 } : {}),
+    radius: round ? 0 : r1, ...(kind === 'variable' ? { radius2: r2 } : {}),
   });
-  useFeaturePreview(p, () => ({ ...full(), id: ex?.id ?? PREVIEW_ID } as Feature), valid, 'add', [kind, edges, faces, faces2, r1, r2]);
+  useFeaturePreview(p, () => ({ ...full(), id: ex?.id ?? PREVIEW_ID } as Feature), valid, 'add', [kind, edges, faces, faces2, faces3, r1, r2]);
 
   usePicking(ctx, {
     onPick(_ref, _pt, sel) {
       const t = ctx.pickTopology();
+      if (round) {
+        // One face per box: a new pick replaces it, then the next box becomes active.
+        const picked = facesFrom(t, sel, []).slice(-1);
+        if (!picked.length) return;
+        if (active === 'items') { setFaces(picked); setActive('set2'); } else if (active === 'set2') { setFaces2(picked); setActive('set3'); } else setFaces3(picked);
+        return;
+      }
       if (kind === 'face') {
         if (active === 'items') setFaces((k) => facesFrom(t, sel, k)); else setFaces2((k) => facesFrom(t, sel, k));
         return;
@@ -292,26 +302,39 @@ function FilletPM(p: P) {
     },
     highlight() {
       const t = ctx.pickTopology();
+      if (round) return selectionOf(t, { faces: active === 'items' ? faces : active === 'set2' ? faces2 : faces3 });
       if (kind === 'face') return selectionOf(t, { faces: active === 'items' ? faces : faces2 });
       return selectionOf(t, { edges, faces: kind === 'constant' ? faces : [] });
     },
-  }, [kind, active, edges, faces, faces2]);
+  }, [kind, active, edges, faces, faces2, faces3]);
 
-  const ok = () => valid && commit(p, ex, full(), () => (kind === 'variable'
+  const ok = () => valid && commit(p, ex, full(), () => (round
+    ? F.addFullRoundFillet(store, { faces, faces2, faces3, name: name.trim() || undefined })
+    : kind === 'variable'
     ? F.addVariableFillet(store, { edges, radius: r1, radius2: r2, name: name.trim() || undefined })
     : kind === 'face' ? F.addFaceFillet(store, { faces, faces2, radius: r1, name: name.trim() || undefined })
     : F.addFillet(store, { edges, faces, radius: r1, name: name.trim() || undefined })));
 
-  const switchKind = (k: FilletFeature['kind']) => { setKind(k); setActive('items'); if (k === 'face') { setEdges([]); setFaces([]); } else if (kind === 'face') { setFaces([]); setFaces2([]); } if (k === 'variable') setFaces([]); };
+  const switchKind = (k: FilletFeature['kind']) => {
+    setKind(k); setActive('items');
+    if (k === 'face' || k === 'fullRound') { setEdges([]); setFaces([]); setFaces2([]); setFaces3([]); } else if (kind === 'face' || kind === 'fullRound') { setFaces([]); setFaces2([]); setFaces3([]); }
+    if (k === 'variable') setFaces([]);
+  };
   return (
     <Shell title={ex ? ex.name : 'Fillet'} icon="fillet" onOk={ok} onCancel={p.close} okDisabled={!valid}
-      help={!complete ? (kind === 'face' ? 'Pick the faces of set 1, then click the second box and pick set 2.' : kind === 'variable' ? 'Click the edges to round.' : 'Click the edges (or faces: all their edges) to round.') : undefined}>
+      help={!complete ? (round ? 'Pick side face 1, then side face 2, then the center face (the face the round replaces). The sides must be flat and parallel.' : kind === 'face' ? 'Pick the faces of set 1, then click the second box and pick set 2.' : kind === 'variable' ? 'Click the edges to round.' : 'Click the edges (or faces: all their edges) to round.') : undefined}>
       <NameSection name={name} setName={setName} placeholder={defaultName} />
       <Section title="Fillet Type">
-        <Radio value={kind} onChange={switchKind} options={[{ id: 'constant', label: 'Constant size' }, { id: 'variable', label: 'Variable size' }, { id: 'face', label: 'Face fillet' }]} />
+        <Radio value={kind} onChange={switchKind} options={[{ id: 'constant', label: 'Constant size' }, { id: 'variable', label: 'Variable size' }, { id: 'face', label: 'Face fillet' }, { id: 'fullRound', label: 'Full round fillet' }]} />
       </Section>
       <Section title="Items To Fillet">
-        {kind === 'face' ? (
+        {round ? (
+          <>
+            <PickBox label="Side face 1" active={active === 'items'} onActivate={() => setActive('items')} items={faceItems(doc, topo, faces)} onRemove={() => setFaces([])} onClear={() => setFaces([])} empty="Pick a face" />
+            <PickBox label="Center face" active={active === 'set3'} onActivate={() => setActive('set3')} items={faceItems(doc, topo, faces3)} onRemove={() => setFaces3([])} onClear={() => setFaces3([])} empty="Pick a face" />
+            <PickBox label="Side face 2" active={active === 'set2'} onActivate={() => setActive('set2')} items={faceItems(doc, topo, faces2)} onRemove={() => setFaces2([])} onClear={() => setFaces2([])} empty="Pick a face" />
+          </>
+        ) : kind === 'face' ? (
           <>
             <PickBox label="Face set 1" active={active === 'items'} onActivate={() => setActive('items')} items={faceItems(doc, topo, faces)} onRemove={(i) => setFaces(faces.filter((_, j) => j !== i))} onClear={() => setFaces([])} empty="Pick faces" />
             <PickBox label="Face set 2" active={active === 'set2'} onActivate={() => setActive('set2')} items={faceItems(doc, topo, faces2)} onRemove={(i) => setFaces2(faces2.filter((_, j) => j !== i))} onClear={() => setFaces2([])} empty="Pick faces" />
@@ -323,7 +346,7 @@ function FilletPM(p: P) {
             onClear={() => { setEdges([]); setFaces([]); }} empty="Pick edges" />
         )}
       </Section>
-      <Section title="Fillet Parameters">
+      {!round && <Section title="Fillet Parameters">
         {kind === 'variable' ? (
           <>
             <ExprField label="Start radius" value={r1} onChange={setR1} store={store} />
@@ -331,7 +354,8 @@ function FilletPM(p: P) {
             <button className="pm-wide" onClick={() => { setR1(r2); setR2(r1); }}>⇄ Swap start and end</button>
           </>
         ) : <ExprField label="Radius" value={r1} onChange={setR1} store={store} />}
-      </Section>
+      </Section>}
+      {round && <p className="pm-help">The radius is half the distance between the side faces, and follows it when the part changes.</p>}
     </Shell>
   );
 }
